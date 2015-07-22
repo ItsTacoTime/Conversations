@@ -231,7 +231,7 @@ public class ContactDetailsActivity extends XmppActivity implements OnAccountUpd
 			case R.id.action_delete_contact:
 				builder.setTitle(getString(R.string.action_delete_contact))
 					.setMessage(
-							getString(R.string.remove_contact_text,
+							getString(R.string.remove_contact_text_remotium,
 								contact.getJid()))
 					.setPositiveButton(getString(R.string.delete),
 							removeFromRoster).create().show();

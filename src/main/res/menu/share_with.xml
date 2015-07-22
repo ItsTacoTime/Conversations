@@ -6,6 +6,6 @@
         android:icon="?attr/icon_new"
         android:orderInCategory="10"
         android:showAsAction="always"
-        android:title="@string/action_add"/>
+        android:title="@string/action_add_remotium"/>
 
 </menu>

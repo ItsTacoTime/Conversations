@@ -5,13 +5,13 @@
         android:icon="?attr/icon_new"
         android:orderInCategory="10"
         android:showAsAction="always"
-        android:title="@string/action_add"/>
+        android:title="@string/action_add_remotium"/>
     <item
         android:id="@+id/action_security"
         android:icon="?attr/icon_not_secure"
         android:orderInCategory="20"
         android:showAsAction="always"
-        android:title="@string/action_secure"/>
+        android:title="@string/action_secure_remotium"/>
     <item
         android:id="@+id/action_attach_file"
         android:icon="?attr/icon_new_attachment"
@@ -43,7 +43,7 @@
         android:id="@+id/action_archive"
         android:orderInCategory="60"
         android:showAsAction="never"
-        android:title="@string/action_end_conversation"/>
+        android:title="@string/action_end_conversation_remotium"/>
     <item
         android:id="@+id/action_mute"
         android:orderInCategory="70"
@@ -55,12 +55,14 @@
         android:orderInCategory="71"
         android:showAsAction="never"
         android:title="@string/enable_notifications"/>
-
+    <!--
+        Removed account management from UI.
     <item
         android:id="@+id/action_accounts"
         android:orderInCategory="90"
         android:showAsAction="never"
         android:title="@string/action_accounts"/>
+     -->
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

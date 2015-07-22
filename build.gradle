@@ -46,6 +46,7 @@ android {
 	buildToolsVersion "23.0.0"
 
 	defaultConfig {
+		applicationId "com.remotium.messages"
 		minSdkVersion 14
 		targetSdkVersion 21
 		versionCode 95

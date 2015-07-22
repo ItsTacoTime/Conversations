@@ -255,7 +255,7 @@ public class ConversationActivity extends XmppActivity
 						if (swipedConversation.getMode() == Conversation.MODE_MULTI) {
 							return getResources().getString(R.string.title_undo_swipe_out_muc);
 						} else {
-							return getResources().getString(R.string.title_undo_swipe_out_conversation);
+							return getResources().getString(R.string.title_undo_swipe_out_conversation_remotium);
 						}
 					}
 				};
@@ -635,7 +635,7 @@ public class ConversationActivity extends XmppActivity
 	@SuppressLint("InflateParams")
 	protected void clearHistoryDialog(final Conversation conversation) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.clear_conversation_history));
+		builder.setTitle(getString(R.string.clear_conversation_history_remotium);
 		View dialogView = getLayoutInflater().inflate(
 				R.layout.dialog_clear_history, null);
 		final CheckBox endConversationCheckBox = (CheckBox) dialogView

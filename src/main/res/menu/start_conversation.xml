@@ -29,11 +29,14 @@
         android:orderInCategory="85"
         android:showAsAction="never"
         android:title="@string/hide_offline"/>
+    <!--
+        Removed account management feature.
     <item
         android:id="@+id/action_accounts"
         android:orderInCategory="90"
         android:showAsAction="never"
         android:title="@string/action_accounts" />
+    -->
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

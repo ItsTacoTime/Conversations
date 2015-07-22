@@ -1140,10 +1140,10 @@ public class ConversationFragment extends Fragment implements EditMessage.Keyboa
 		builder.setIconAttribute(android.R.attr.alertDialogIcon);
 		if (plural) {
 			builder.setTitle(getString(R.string.no_pgp_keys));
-			builder.setMessage(getText(R.string.contacts_have_no_pgp_keys));
+			builder.setMessage(getText(R.string.contacts_have_no_pgp_keys_remotium));
 		} else {
 			builder.setTitle(getString(R.string.no_pgp_key));
-			builder.setMessage(getText(R.string.contact_has_no_pgp_key));
+			builder.setMessage(getText(R.string.contact_has_no_pgp_key_remotium));
 		}
 		builder.setNegativeButton(getString(R.string.cancel), null);
 		builder.setPositiveButton(getString(R.string.send_unencrypted),

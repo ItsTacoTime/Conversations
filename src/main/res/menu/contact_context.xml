@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/context_start_conversation"
-        android:title="@string/start_conversation"/>
+        android:title="@string/start_conversation_remotium"/>
     <item
         android:id="@+id/context_contact_details"
         android:title="@string/view_contact_details"/>

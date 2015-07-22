@@ -48,7 +48,10 @@
             android:name=".ui.StartConversationActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTask"
+            android:label="@string/title_activity_start_conversation_remotium" >
+            <!--
             android:label="@string/title_activity_start_conversation" >
+            -->
             <intent-filter>
                 <action android:name="android.intent.action.SENDTO" />
 

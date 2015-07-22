@@ -5,12 +5,14 @@
 		android:id="@+id/action_show_qr_code"
 		android:title="@string/show_qr_code"
 		android:showAsAction="never" />
-
+    <!--
+        Removed account management feature.
     <item
         android:id="@+id/action_accounts"
         android:orderInCategory="90"
         android:showAsAction="never"
         android:title="@string/action_accounts" />
+    -->
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

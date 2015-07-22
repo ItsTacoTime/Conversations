@@ -86,7 +86,7 @@ public class ShareWithActivity extends XmppActivity {
 		}
 
 		setContentView(R.layout.share_with);
-		setTitle(getString(R.string.title_activity_sharewith));
+		setTitle(getString(R.string.title_activity_sharewith_remotium));
 
 		mListView = (ListView) findViewById(R.id.choose_conversation_list);
 		ConversationAdapter mAdapter = new ConversationAdapter(this,

@@ -298,8 +298,8 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setNegativeButton(R.string.cancel, null);
 		builder.setTitle(R.string.action_delete_contact);
-		builder.setMessage(getString(R.string.remove_contact_text,
-				contact.getJid()));
+		builder.setMessage(getString(R.string.remove_contact_text_remotium,
+					contact.getJid()));
 		builder.setPositiveButton(R.string.delete, new OnClickListener() {
 
 			@Override

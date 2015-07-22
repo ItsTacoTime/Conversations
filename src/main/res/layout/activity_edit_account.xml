@@ -41,20 +41,56 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_toRightOf="@+id/avater">
+
                 <TextView
                     android:id="@+id/account_jid_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/account_settings_jabber_id"
+                    android:text="@string/account_settings_server_hostname"
                     android:textColor="@color/black87"
                     android:textSize="?attr/TextSizeBody" />
 
                 <AutoCompleteTextView
-                    android:id="@+id/account_jid"
+                    android:id="@+id/account_jid_hostname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/account_settings_example_jabber_id"
+                    android:hint="@string/account_settings_example_server_hostname"
                     android:inputType="textEmailAddress"
+                    android:textColor="@color/black87"
+                    android:textColorHint="@color/black54"
+                    android:textSize="?attr/TextSizeBody" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_settings_port_number"
+                    android:textColor="@color/black87"
+                    android:textSize="?attr/TextSizeBody" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/account_jid_port_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/account_settings_example_port_number"
+                    android:inputType="number"
+                    android:textColor="@color/black87"
+                    android:textColorHint="@color/black54"
+                    android:textSize="?attr/TextSizeBody" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/account_settings_username"
+                    android:textColor="@color/black87"
+                    android:textSize="?attr/TextSizeBody" />
+
+                <EditText
+                    android:id="@+id/account_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/account_settings_example_jabber_user"
+                    android:inputType="text"
                     android:textColor="@color/black87"
                     android:textColorHint="@color/black54"
                     android:textSize="?attr/TextSizeBody" />

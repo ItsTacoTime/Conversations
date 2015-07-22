@@ -80,8 +80,8 @@ public class ExceptionHelper {
 			file.close();
 			context.deleteFile("stacktrace.txt");
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-			builder.setTitle(context.getString(R.string.crash_report_title));
-			builder.setMessage(context.getText(R.string.crash_report_message));
+			builder.setTitle(context.getString(R.string.crash_report_title_remotium));
+			builder.setMessage(context.getText(R.string.crash_report_message_remotium));
 			builder.setPositiveButton(context.getText(R.string.send_now),
 					new OnClickListener() {
 

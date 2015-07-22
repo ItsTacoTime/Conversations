@@ -231,7 +231,7 @@ public class NotificationService {
 		style.setBigContentTitle(notifications.size()
 				+ " "
 				+ mXmppConnectionService
-				.getString(R.string.unread_conversations));
+				.getString(R.string.unread_conversations_remotium));
 		final StringBuilder names = new StringBuilder();
 		Conversation conversation = null;
 		for (final ArrayList<Message> messages : notifications.values()) {
@@ -250,7 +250,7 @@ public class NotificationService {
 		mBuilder.setContentTitle(notifications.size()
 				+ " "
 				+ mXmppConnectionService
-				.getString(R.string.unread_conversations));
+				.getString(R.string.unread_conversations_remotium));
 		mBuilder.setContentText(names.toString());
 		mBuilder.setStyle(style);
 		if (conversation != null) {
@@ -489,8 +489,8 @@ public class NotificationService {
 	public Notification createForegroundNotification() {
 		final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mXmppConnectionService);
 
-		mBuilder.setContentTitle(mXmppConnectionService.getString(R.string.conversations_foreground_service));
-		mBuilder.setContentText(mXmppConnectionService.getString(R.string.touch_to_open_conversations));
+		mBuilder.setContentTitle(mXmppConnectionService.getString(R.string.conversations_foreground_service_remotium));
+		mBuilder.setContentText(mXmppConnectionService.getString(R.string.touch_to_open_conversations_remotium));
 		mBuilder.setContentIntent(createOpenConversationsIntent());
 		mBuilder.setWhen(0);
 		mBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
