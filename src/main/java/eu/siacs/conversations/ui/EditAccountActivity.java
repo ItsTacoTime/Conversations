@@ -546,7 +546,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			}
 
 			/* The IP and Port in this case are used for auto-configuration of RVMP. IP address
-			 * and Port are NEVER required by the XMPP protocol, but in our case will
+			 * and Port are NOT required by the XMPP protocol, but in our case will
 			 * be used to override the standard domain lookup function used by the protocol.
 			 * See XMPPConnection.java and AccountRemotium.java for special handling when using
 			 * RVMP auto-configuration.
@@ -568,12 +568,11 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				}
 			}
 
-				/* TODO: TLS and Compression are disabled for now.
-				 *       It will be necessary to fix this in the future. */
+			/* TODO: TLS and Compression are disabled for now.
+			 *       It will be necessary to fix this in the future. */
 			mAccount.setOption(Account.OPTION_USETLS, false);
 			mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
-			/********************************************************
-			 */
+
 			Log.v(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
 			xmppConnectionService.createAccount(mAccount);
 		}
