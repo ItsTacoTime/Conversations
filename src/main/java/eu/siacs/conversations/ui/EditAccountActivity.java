@@ -502,6 +502,11 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		return super.onOptionsItemSelected(item);
 	}
 
+	/*
+	 * Configure a jabber account from Intent. If the account already exists,
+	 * reconfigure the account with new information.
+	 * TODO: Need to add a mechanism for deleting an account.
+	 */
 	protected void AutoConfigureAccount(Intent intent) {
 
 		String jabber_id = intent.getStringExtra(EXTRAS_JID);
@@ -529,7 +534,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			mAccount.setKey(EXTRAS_PORT, "" + jabber_port);
 			xmppConnectionService.updateAccount(mAccount);
 		} else {
-			Log.d(TAG, "Adding account with jid: " + jid);
+			Log.v(TAG, "Adding account with jid: " + jid);
 			if (xmppConnectionService == null) {
 				Log.e(TAG, "Need to wait for XMPPConnectionService reconnect.");
 				this.connectToBackend();
@@ -569,7 +574,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
 			/********************************************************
 			 */
-			Log.d(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
+			Log.v(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
 			xmppConnectionService.createAccount(mAccount);
 		}
 		final Avatar avatar = null;

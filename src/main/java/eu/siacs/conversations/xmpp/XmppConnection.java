@@ -154,7 +154,7 @@ public class XmppConnection implements Runnable {
 			if (DNSHelper.isIp(account.getServer().toString())) {
 				socket = new Socket();
 				try {
-					socket.connect(new InetSocketAddress(account.getServer().toString(), 5222), Config.SOCKET_TIMEOUT * 1000);
+					socket.connect(new InetSocketAddress(account.getServer().toString(), account.getPort()), Config.SOCKET_TIMEOUT * 1000);
 				} catch (IOException e) {
 					throw new UnknownHostException();
 				}

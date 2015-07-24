@@ -7,18 +7,17 @@ import org.json.JSONObject;
 
 import eu.siacs.conversations.xmpp.jid.InvalidJidException;
 import eu.siacs.conversations.xmpp.jid.Jid;
-
 /**
  * Created by hlew on 7/23/15.
  */
 public class AccountRemotium extends Account {
     private static final String TAG = "AccountRemotium";
 
-    /* Keep in sync with EditAccountActivity.java and AccManager */
+    /* Keep in sync with EditAccountActivity.java and AccManager.java */
     private static final String EXTRAS_IP = "jabber_ip";
 
     /**
-     * Standard {@code Account} constructor from parent class.
+     * Constructs {@code Account} from parent class constructor.
      *
      */
     public AccountRemotium() {
@@ -26,7 +25,7 @@ public class AccountRemotium extends Account {
     }
 
     /**
-     * Standard {@code Account} constructor from parent class.
+     * Constructs {@code Account} from parent class constructor.
      *
      * @param jid
      * @param password
@@ -36,7 +35,7 @@ public class AccountRemotium extends Account {
     }
 
     /**
-     * Creates a new {@code Account} with name/value mappings from the JSON
+     * Creates a new {@code Account} with key/value mappings from the JSON
      * string.
      *
      * @param jid a Jid object describing a jabber account.
@@ -94,6 +93,37 @@ public class AccountRemotium extends Account {
 
         return (jid == null) ? super.getJid() : jid;
 
+    }
+
+    @Override
+    /**
+     *  Extracts the port number from {@AccountRemotium} in the key/value
+     * store. The value only exists if it was sent through an intent.
+     *
+     * @return int The port tied to the account.
+     */
+    public int getPort() {
+        final JSONObject keys = super.getKeys();
+        if (keys.has("jabber_port")) {
+            int port;
+            try {
+                port = Integer.valueOf(keys.getString("jabber_port"));
+                /* Validate the port. */
+                if ((port > 0) && (port < 65535)) {
+                    port = super.getPort();
+                }
+            } catch (JSONException ignored) {
+                // this should never happen
+                port= super.getPort();
+            } catch (ClassCastException notInt) {
+                port = super.getPort(); // Try the default port
+            } catch (NullPointerException nullobject) {
+                port = super.getPort();
+            }
+            return port;
+        }
+
+        return super.getPort();
     }
 
 }

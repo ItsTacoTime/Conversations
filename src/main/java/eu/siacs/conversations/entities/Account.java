@@ -28,6 +28,10 @@ import eu.siacs.conversations.xmpp.jid.Jid;
 
 public class Account extends AbstractEntity {
 
+	/* Recommended XMPP client port by RFC 3920 Section 15.9
+	 * https://www.ietf.org/rfc/rfc3920.txt */
+	private static final int XMPP_CLIENT_PORT= 5222;
+
 	public static final String TABLENAME = "accounts";
 
 	public static final String USERNAME = "username";
@@ -200,6 +204,10 @@ public class Account extends AbstractEntity {
 
 	public Jid getServer() {
 		return jid.toDomainJid();
+	}
+
+	public int getPort() {
+		return XMPP_CLIENT_PORT;
 	}
 
 	public void setServer(final String server) throws InvalidJidException {
