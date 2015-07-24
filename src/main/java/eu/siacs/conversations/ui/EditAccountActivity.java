@@ -28,8 +28,11 @@ import android.util.Log;
 
 import java.util.Set;
 
-import eu.siacs.conversations.Config;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import eu.siacs.conversations.R;
+import eu.siacs.conversations.Config;
 import eu.siacs.conversations.crypto.axolotl.AxolotlService;
 import eu.siacs.conversations.entities.Account;
 import eu.siacs.conversations.services.XmppConnectionService.OnAccountUpdate;
@@ -522,6 +525,8 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				return;
 			}
 			mAccount.setPassword(jabber_password);
+			mAccount.setKey(EXTRAS_IP, jabber_ip);
+			mAccount.setKey(EXTRAS_PORT, "" + jabber_port);
 			xmppConnectionService.updateAccount(mAccount);
 		} else {
 			Log.d(TAG, "Adding account with jid: " + jid);
@@ -535,7 +540,27 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				return;
 			}
 
-			mAccount = new Account(jid.toBareJid(), jabber_password);
+			/* The IP and Port in this case are used for auto-configuration of RVMP. IP address
+			 * and Port are NEVER required by the XMPP protocol, but in our case will
+			 * be used to override the standard domain lookup function used by the protocol.
+			 * See XMPPConnection.java for special handling when using RVMP auto-configuration.
+			 */
+			JSONObject extras = null;
+			try {
+				extras = new JSONObject();
+				extras.put(EXTRAS_IP, jabber_ip);
+				extras.put(EXTRAS_PORT, "" + jabber_port);
+			} catch (JSONException e) {
+				// Just keeping with the documentation.
+				throw new RuntimeException(e);
+			} finally {
+				if (extras == null) {
+					mAccount = new Account(jid.toBareJid(), jabber_password);
+				}
+				else {
+					mAccount = new Account(jid.toBareJid(), jabber_password, extras.toString());
+				}
+			}
 
 				/* TODO: TLS and Compression are disabled for now.
 				 *       It will be necessary to fix this in the future. */
@@ -543,10 +568,10 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
 			/********************************************************
 			 */
-
+			Log.d(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
 			xmppConnectionService.createAccount(mAccount);
 		}
-		Avatar avatar = null;
+		final Avatar avatar = null;
 		this.finishInitialSetup(avatar);
 
 	}

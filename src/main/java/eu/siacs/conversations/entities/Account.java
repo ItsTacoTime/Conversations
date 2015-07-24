@@ -143,6 +143,20 @@ public class Account extends AbstractEntity {
 				password, 0, null, "", null);
 	}
 
+	/**
+	 * Creates a new {@code Account} with name/value mappings from the JSON
+	 * string.
+	 *
+	 * @param jid a Jid object describing a jabber account.
+	 * @param password a string containing a password
+	 * @param keys a JSON-encoded string containing an object.
+	 *
+	 */
+	public Account(final Jid jid, final String password, final String keys) {
+		this(java.util.UUID.randomUUID().toString(), jid,
+				password, 0, null, keys, null);
+	}
+
 	public Account(final String uuid, final Jid jid,
 			final String password, final int options, final String rosterVersion, final String keys,
 			final String avatar) {
