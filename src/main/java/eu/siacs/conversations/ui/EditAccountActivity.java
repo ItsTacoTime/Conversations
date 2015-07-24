@@ -35,6 +35,7 @@ import eu.siacs.conversations.R;
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.crypto.axolotl.AxolotlService;
 import eu.siacs.conversations.entities.Account;
+import eu.siacs.conversations.entities.AccountRemotium;
 import eu.siacs.conversations.services.XmppConnectionService.OnAccountUpdate;
 import eu.siacs.conversations.ui.adapter.KnownHostsAdapter;
 import eu.siacs.conversations.utils.CryptoHelper;
@@ -558,7 +559,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 					mAccount = new Account(jid.toBareJid(), jabber_password);
 				}
 				else {
-					mAccount = new Account(jid.toBareJid(), jabber_password, extras.toString());
+					mAccount = new AccountRemotium(jid.toBareJid(), jabber_password, extras.toString());
 				}
 			}
 
