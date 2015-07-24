@@ -94,7 +94,8 @@
             android:label="@string/title_activity_manage_accounts" />
         <activity
             android:name=".ui.EditAccountActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:exported="true"/>
         <activity
             android:name=".ui.ConferenceDetailsActivity"
             android:label="@string/title_activity_conference_details"

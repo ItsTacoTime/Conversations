@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
 import java.util.Set;
 
@@ -42,6 +43,13 @@ import eu.siacs.conversations.xmpp.jid.Jid;
 import eu.siacs.conversations.xmpp.pep.Avatar;
 
 public class EditAccountActivity extends XmppActivity implements OnAccountUpdate, OnKeyStatusUpdated {
+	private static final String TAG = "EditAccount";
+
+	private static final String ACTION_ADD_ACCOUNT = "eu.siacs.conversations.ADD_ACCOUNT";
+	private static final String EXTRAS_JID = "jabber_id";
+	private static final String EXTRAS_IP = "jabber_ip";
+	private static final String EXTRAS_PASSWORD = "jabber_password";
+	private static final String EXTRAS_PORT = "jabber_port";
 
 	private AutoCompleteTextView mAccountJid;
 	private EditText mPassword;
@@ -362,6 +370,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		this.mSaveButton.setOnClickListener(this.mSaveButtonClickListener);
 		this.mCancelButton.setOnClickListener(this.mCancelButtonClickListener);
 		this.mMoreTable = (TableLayout) findViewById(R.id.server_info_more);
+
 		final OnCheckedChangeListener OnCheckedShowConfirmPassword = new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(final CompoundButton buttonView,
@@ -454,6 +463,14 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 					xmppConnectionService.getKnownHosts());
 			this.mAccountJid.setAdapter(mKnownHostsAdapter);
 		}
+
+		/* Account configuration from intent. */
+		Intent intent = getIntent();
+		String action = intent.getAction();
+		if (action != null && action.equals(ACTION_ADD_ACCOUNT)) {
+			AutoConfigureAccount(intent);
+		}
+
 		updateSaveButton();
 	}
 
@@ -481,6 +498,59 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		return super.onOptionsItemSelected(item);
 	}
 
+	protected void AutoConfigureAccount(Intent intent) {
+
+		String jabber_id = intent.getStringExtra(EXTRAS_JID);
+		String jabber_ip = intent.getStringExtra(EXTRAS_IP);
+		String jabber_password = intent.getStringExtra(EXTRAS_PASSWORD);
+		int jabber_port = intent.getIntExtra(EXTRAS_PORT, 5222);
+
+		Log.v(TAG, "Configuring jabber account for " + jabber_id + " on ip: " + jabber_ip + ":" + jabber_port);
+		final Jid jid;
+		try {
+			jid = Jid.fromString(jabber_id);
+		} catch (final InvalidJidException e) {
+			Log.e(TAG, "Bad jid provided:" + jabber_id);
+			return;
+		}
+		final boolean registerNewAccount = true;
+		if (mAccount != null) {
+			try {
+				mAccount.setUsername(jid.hasLocalpart() ? jid.getLocalpart() : "");
+				mAccount.setServer(jid.getDomainpart());
+			} catch (final InvalidJidException ignored) {
+				return;
+			}
+			mAccount.setPassword(jabber_password);
+			xmppConnectionService.updateAccount(mAccount);
+		} else {
+			Log.d(TAG, "Adding account with jid: " + jid);
+			if (xmppConnectionService == null) {
+				Log.e(TAG, "Need to wait for XMPPConnectionService reconnect.");
+				this.connectToBackend();
+				return;
+			}
+			if (xmppConnectionService.findAccountByJid(jid) != null) {
+				Log.e(TAG, "Tried to configure an account which already exists: " + jid);
+				return;
+			}
+
+			mAccount = new Account(jid.toBareJid(), jabber_password);
+
+				/* TODO: TLS and Compression are disabled for now.
+				 *       It will be necessary to fix this in the future. */
+			mAccount.setOption(Account.OPTION_USETLS, false);
+			mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
+			/********************************************************
+			 */
+
+			xmppConnectionService.createAccount(mAccount);
+		}
+		Avatar avatar = null;
+		this.finishInitialSetup(avatar);
+
+	}
+
 	private void updateAccountInformation(boolean init) {
 		if (init) {
 			if (Config.DOMAIN_LOCK != null) {
@@ -490,6 +560,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			}
 			this.mPassword.setText(this.mAccount.getPassword());
 		}
+
 		if (this.jidToEdit != null) {
 			this.mAvatar.setVisibility(View.VISIBLE);
 			this.mAvatar.setImageBitmap(avatarService().get(this.mAccount, getPixel(72)));
