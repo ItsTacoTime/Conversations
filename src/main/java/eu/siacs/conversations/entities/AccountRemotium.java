@@ -17,6 +17,20 @@ public class AccountRemotium extends Account {
     /* Keep in sync with EditAccountActivity.java and AccManager */
     private static final String EXTRAS_IP = "jabber_ip";
 
+    /**
+     * Standard {@code Account} constructor from parent class.
+     *
+     */
+    public AccountRemotium() {
+        super();
+    }
+
+    /**
+     * Standard {@code Account} constructor from parent class.
+     *
+     * @param jid
+     * @param password
+     */
     public AccountRemotium(final Jid jid, final String password) {
         super(jid, password);
     }
@@ -56,7 +70,7 @@ public class AccountRemotium extends Account {
                 // this should never happen
             }
             if (ip_address != null) {
-                return getJid(ip_address);
+                return getJid(ip_address).toDomainJid();
             }
         }
 
@@ -70,14 +84,15 @@ public class AccountRemotium extends Account {
      *
      */
     public Jid getJid(String ipAddress) {
-        Jid jid = null;
+        Jid jid;
         try {
             jid = Jid.fromParts(super.getJid().getLocalpart(), ipAddress, super.getJid().getDomainpart());
         } catch (InvalidJidException e) {
             Log.e(TAG, "Invalid Jid conversion to IP: " + e);
+            jid = null;
         }
 
-        return (jid != null) ? jid : super.getJid();
+        return (jid == null) ? super.getJid() : jid;
 
     }
 

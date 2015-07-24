@@ -517,7 +517,6 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			Log.e(TAG, "Bad jid provided:" + jabber_id);
 			return;
 		}
-		final boolean registerNewAccount = true;
 		if (mAccount != null) {
 			try {
 				mAccount.setUsername(jid.hasLocalpart() ? jid.getLocalpart() : "");
@@ -544,7 +543,8 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			/* The IP and Port in this case are used for auto-configuration of RVMP. IP address
 			 * and Port are NEVER required by the XMPP protocol, but in our case will
 			 * be used to override the standard domain lookup function used by the protocol.
-			 * See XMPPConnection.java for special handling when using RVMP auto-configuration.
+			 * See XMPPConnection.java and AccountRemotium.java for special handling when using
+			 * RVMP auto-configuration.
 			 */
 			JSONObject extras = null;
 			try {
