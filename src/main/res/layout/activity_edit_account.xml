@@ -87,6 +87,15 @@
                     android:textColor="@color/primarytext"
                     android:textSize="?attr/TextSizeBody" />
 
+                <CheckBox
+                    android:id="@+id/account_settings_advanced_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/account_settings_advanced_settings"
+                    android:textColor="@color/black87"
+                    android:textSize="?attr/TextSizeBody" />
+
                 <TextView
                     android:id="@+id/account_confirm_password_desc"
                     android:layout_width="wrap_content"
@@ -107,6 +116,46 @@
                     android:textColor="@color/primarytext"
                     android:textColorHint="@color/secondarytext"
                     android:textSize="?attr/TextSizeBody" />
+
+                <TextView
+                    android:id="@+id/account_server_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_settings_server"
+                    android:textColor="@color/black87"
+                    android:textSize="?attr/TextSizeBody"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/account_server_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textColor="@color/black87"
+                    android:textColorHint="@color/black54"
+                    android:textSize="?attr/TextSizeBody"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/account_port_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_settings_port"
+                    android:textColor="@color/black87"
+                    android:textSize="?attr/TextSizeBody"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/account_port_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:hint="@string/account_settings_example_port"
+                    android:textColor="@color/black87"
+                    android:textColorHint="@color/black54"
+                    android:textSize="?attr/TextSizeBody"
+                    android:visibility="gone" />
+
                 </LinearLayout>
             </RelativeLayout>
 

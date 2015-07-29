@@ -187,6 +187,10 @@
 	<string name="account_settings_password">Password</string>
 	<string name="account_settings_example_jabber_id">username@example.com</string>
 	<string name="account_settings_confirm_password">Confirm password</string>
+	<string name="account_settings_advanced_settings">Advanced settings</string>
+	<string name="account_settings_server">Server</string>
+	<String name="account_settings_port">Port</String>
+	<String name="account_settings_example_port">5222</String>
 	<string name="password">Password</string>
 	<string name="confirm_password">Confirm password</string>
 	<string name="passwords_do_not_match">Passwords do not match</string>
