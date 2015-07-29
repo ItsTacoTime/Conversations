@@ -160,7 +160,8 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 					mAccountJid.requestFocus();
 					return;
 				}
-				mAccount = new Account(jid.toBareJid(), password);
+				//mAccount = new Account(jid.toBareJid(), password);
+				mAccount = new AccountRemotium(jid.toBareJid(), password);
 				mAccount.setOption(Account.OPTION_USETLS, true);
 				mAccount.setOption(Account.OPTION_USECOMPRESSION, true);
 				mAccount.setOption(Account.OPTION_REGISTER, registerNewAccount);
