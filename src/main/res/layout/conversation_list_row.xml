@@ -13,7 +13,7 @@
 		android:id="@+id/swipeable_item"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:background="@color/grey50">
+		android:background="@color/primarybackground">
 
 	<RelativeLayout
 		android:layout_width="fill_parent"
@@ -44,7 +44,7 @@
 				android:layout_alignLeft="@+id/conversation_lastwrapper"
 				android:layout_toLeftOf="@+id/conversation_lastupdate"
 				android:singleLine="true"
-				android:textColor="@color/black87"
+				android:textColor="@color/primarytext"
 				android:textSize="?attr/TextSizeHeadline"
 				android:typeface="sans" />
 
@@ -62,14 +62,14 @@
 					android:layout_height="wrap_content"
 					android:scrollHorizontally="false"
 					android:singleLine="true"
-					android:textColor="@color/black87"
+					android:textColor="@color/primarytext"
 					android:textSize="?attr/TextSizeBody" />
 
 				<ImageView
 					android:id="@+id/conversation_lastimage"
 					android:layout_width="fill_parent"
 					android:layout_height="36dp"
-					android:background="@color/black87"
+					android:background="@color/primarytext"
 					android:scaleType="centerCrop" />
 			</LinearLayout>
 
@@ -80,7 +80,7 @@
 				android:layout_alignBaseline="@+id/conversation_name"
 				android:layout_alignParentRight="true"
 				android:gravity="right"
-				android:textColor="@color/black54"
+				android:textColor="@color/secondarytext"
 				android:textSize="?attr/TextSizeInfo" />
 		</RelativeLayout>
 	</RelativeLayout>

@@ -55,6 +55,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	private static final String EXTRAS_IP = "jabber_ip";
 	private static final String EXTRAS_PASSWORD = "jabber_password";
 	private static final String EXTRAS_PORT = "jabber_port";
+	private static final String EXTRAS_USE_TLS = "jabber_use_tls";
 
 	private AutoCompleteTextView mAccountJid;
 	private EditText mPassword;
@@ -510,18 +511,50 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	 * TODO: Need to add a mechanism for deleting an account.
 	 */
 	private class AutoConfigureAccountTask extends AsyncTask<Intent, Void, Void> {
+		@Override
 		protected Void doInBackground(Intent... intents) {
+			/* TODO: Need to check to make sure this doesn't get stuck in a loop */
+			if (xmppConnectionService == null) {
+				// This should never happen
+				Log.e(TAG, "Need to wait for XMPPConnectionService reconnect.");
+				connectToBackend();
+			}
+
 			Intent intent = intents[0];
+			populateAccountFromIntent(intent);
+
+			/* TODO: You're leaking the password here. */
+			Log.v(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
+
+			if (xmppConnectionService.findAccountByJid(mAccount.getJid()) != null) {
+				/* Update account */
+				Log.v(TAG, "Tried to configure an account which already exists: " + mAccount.getJid());
+				Log.v(TAG, "Updating account with jid: " + mAccount.getJid());
+				xmppConnectionService.updateAccount(mAccount);
+			} else {
+				/* Add new account */
+				Log.v(TAG, "Adding account with jid: " + mAccount.getJid());
+				xmppConnectionService.createAccount(mAccount);
+			}
+
+			final Avatar avatar = null;
+			finishInitialSetup(avatar);
+
+			return null;
+		}
+
+		private void populateAccountFromIntent(Intent intent) {
+
 			String jabberId = intent.getStringExtra(EXTRAS_JID);
 			String jabberIp = intent.getStringExtra(EXTRAS_IP);
 			String jabberPassword = intent.getStringExtra(EXTRAS_PASSWORD);
+			boolean jabberUseTls = intent.getBooleanExtra(EXTRAS_USE_TLS, false);
 
 			// int jabberPort = intent.getIntExtra(EXTRAS_PORT, 5222); // default port is 5222
 			/* For debugging only using adb */
 			String jabberPortString = intent.getStringExtra(EXTRAS_PORT);
 			Log.v(TAG, "Jabber port string: " + jabberPortString);
 			int jabberPort = Integer.parseInt(jabberPortString);
-
 			/* ***************************** */
 
 			Log.v(TAG, "Configuring jabber account for "
@@ -531,65 +564,34 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				jid = Jid.fromString(jabberId);
 			} catch (final InvalidJidException e) {
 				Log.e(TAG, "Bad jid provided:" + jabberId);
-				return null;
+				return;
 			}
-			if (mAccount != null) {
-				try {
-					mAccount.setUsername(jid.hasLocalpart() ? jid.getLocalpart() : "");
-					mAccount.setServer(jid.getDomainpart());
-				} catch (final InvalidJidException ignored) {
-					return null;
-				}
-				mAccount.setPassword(jabberPassword);
-				mAccount.setKey(EXTRAS_IP, jabberIp);
-				mAccount.setKey(EXTRAS_PORT, "" + jabberPort);
-				xmppConnectionService.updateAccount(mAccount);
-			} else {
-				Log.v(TAG, "Adding account with jid: " + jid);
-				if (xmppConnectionService == null) {
-					Log.e(TAG, "Need to wait for XMPPConnectionService reconnect.");
-					//this.connectToBackend();
-					return null;
-				}
-				if (xmppConnectionService.findAccountByJid(jid) != null) {
-					Log.e(TAG, "Tried to configure an account which already exists: " + jid);
-					return null;
-				}
 
-			/* The IP and Port in this case are used for auto-configuration of RVMP. IP address
-			 * and Port are NOT required by the XMPP protocol, but in our case will
+			/* IP address and Port are NOT required by the XMPP protocol, but in our case will
 			 * be used to override the standard domain lookup function used by the protocol.
 			 * See XMPPConnection.java and AccountRemotium.java for special handling when using
 			 * RVMP auto-configuration.
 			 */
-				JSONObject extras = null;
-				try {
-					extras = new JSONObject();
-					extras.put(EXTRAS_IP, jabberIp);
-					extras.put(EXTRAS_PORT, "" + jabberPort);
-				} catch (JSONException e) {
-					// Just keeping with the documentation.
-					throw new RuntimeException(e);
-				} finally {
-					if (extras == null) {
-						mAccount = new Account(jid.toBareJid(), jabberPassword);
-					} else {
-						mAccount = new AccountRemotium(jid.toBareJid(), jabberPassword, extras.toString());
-					}
+			JSONObject extras = null;
+			try {
+				extras = new JSONObject();
+				extras.put(EXTRAS_IP, jabberIp);
+				extras.put(EXTRAS_PORT, "" + jabberPort);
+			} catch (JSONException e) {
+				// Just keeping with the documentation.
+				throw new RuntimeException(e);
+			} finally {
+				if (extras == null) {
+					mAccount = new AccountRemotium(jid.toBareJid(), jabberPassword);
+				} else {
+					mAccount = new AccountRemotium(jid.toBareJid(), jabberPassword, extras.toString());
 				}
-
-			/* TODO: TLS and Compression are disabled for now.
-			 *       It will be necessary to fix this in the future. */
-				mAccount.setOption(Account.OPTION_USETLS, true);
-				mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
-
-				Log.v(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
-				xmppConnectionService.createAccount(mAccount);
 			}
-			final Avatar avatar = null;
-			finishInitialSetup(avatar);
 
-			return null;
+			/* TODO: Compression is disabled for now. Do we need it?
+			 *       It will be necessary to fix this in the future. */
+			mAccount.setOption(Account.OPTION_USETLS, jabberUseTls);
+			mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
 		}
 
 	}

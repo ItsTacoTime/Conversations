@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -541,12 +540,7 @@ public class ConversationFragment extends Fragment implements EditMessage.Keyboa
 			}
 			shareIntent.setType(mime);
 		}
-		try {
-			activity.startActivity(Intent.createChooser(shareIntent, getText(R.string.share_with)));
-		} catch (ActivityNotFoundException e) {
-			//This should happen only on faulty androids because normally chooser is always available
-			Toast.makeText(activity,R.string.no_application_found_to_open_file,Toast.LENGTH_SHORT).show();
-		}
+		activity.startActivity(Intent.createChooser(shareIntent, getText(R.string.share_with)));
 	}
 
 	private void copyText(Message message) {

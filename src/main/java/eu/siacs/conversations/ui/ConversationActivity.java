@@ -758,11 +758,14 @@ public class ConversationActivity extends XmppActivity
 							break;
 						case R.id.encryption_choice_pgp:
 							if (hasPgp()) {
-								if (conversation.getAccount().getKeys().has("pgp_signature")) {
-									conversation.setNextEncryption(Message.ENCRYPTION_PGP);
+								if (conversation.getAccount().getKeys()
+										.has("pgp_signature")) {
+									conversation
+										.setNextEncryption(Message.ENCRYPTION_PGP);
 									item.setChecked(true);
 								} else {
-									announcePgp(conversation.getAccount(),conversation);
+									announcePgp(conversation.getAccount(),
+											conversation);
 								}
 							} else {
 								showInstallPgpDialog();
@@ -778,7 +781,8 @@ public class ConversationActivity extends XmppActivity
 							conversation.setNextEncryption(Message.ENCRYPTION_NONE);
 							break;
 					}
-					xmppConnectionService.databaseBackend.updateConversation(conversation);
+					xmppConnectionService.databaseBackend
+						.updateConversation(conversation);
 					fragment.updateChatMsgHint();
 					invalidateOptionsMenu();
 					refreshUi();
@@ -791,6 +795,7 @@ public class ConversationActivity extends XmppActivity
 			MenuItem pgp = popup.getMenu().findItem(R.id.encryption_choice_pgp);
 			MenuItem axolotl = popup.getMenu().findItem(R.id.encryption_choice_axolotl);
 			pgp.setVisible(!Config.HIDE_PGP_IN_UI);
+
 			if (conversation.getMode() == Conversation.MODE_MULTI) {
 				otr.setVisible(false);
 				axolotl.setVisible(false);
@@ -805,13 +810,15 @@ public class ConversationActivity extends XmppActivity
 					otr.setChecked(true);
 					break;
 				case Message.ENCRYPTION_PGP:
-					pgp.setChecked(true);
+					popup.getMenu().findItem(R.id.encryption_choice_pgp)
+						.setChecked(true);
 					break;
 				case Message.ENCRYPTION_AXOLOTL:
 					axolotl.setChecked(true);
 					break;
 				default:
-					none.setChecked(true);
+					popup.getMenu().findItem(R.id.encryption_choice_none)
+						.setChecked(true);
 					break;
 			}
 			popup.show();
