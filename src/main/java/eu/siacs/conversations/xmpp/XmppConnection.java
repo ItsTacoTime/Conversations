@@ -49,6 +49,7 @@ import eu.siacs.conversations.crypto.sasl.SaslMechanism;
 import eu.siacs.conversations.crypto.sasl.ScramSha1;
 import eu.siacs.conversations.entities.Account;
 import eu.siacs.conversations.entities.Message;
+import eu.siacs.conversations.entities.AccountRemotium;
 import eu.siacs.conversations.generator.IqGenerator;
 import eu.siacs.conversations.services.XmppConnectionService;
 import eu.siacs.conversations.utils.CryptoHelper;
@@ -141,6 +142,8 @@ public class XmppConnection implements Runnable {
 	}
 
 	protected void connect() {
+		/* To allow overloaded getPorts() to return a custom port. */
+		AccountRemotium rAccount = (AccountRemotium) account;
 		Log.d(Config.LOGTAG, account.getJid().toBareJid().toString() + ": connecting");
 		features.encryptionEnabled = false;
 		lastConnect = SystemClock.elapsedRealtime();
@@ -151,10 +154,17 @@ public class XmppConnection implements Runnable {
 			tagReader = new XmlReader(wakeLock);
 			tagWriter = new TagWriter();
 			this.changeStatus(Account.State.CONNECTING);
-			if (DNSHelper.isIp(account.getServer().toString())) {
+			/*
+			 * We use rAccount.getServerOrIP() to test if a custom IP address should override DNS
+			 * lookup behavior. If no IP was provided, it returns the superclass domain for standard
+			 * lookup.
+			 */
+			if (DNSHelper.isIp(rAccount.getServerOrIp().toString())) {
 				socket = new Socket();
 				try {
-					socket.connect(new InetSocketAddress(account.getServer().toString(), account.getPort()), Config.SOCKET_TIMEOUT * 1000);
+					/* getServerOrIP() has also been used here during connect */
+					socket.connect(new InetSocketAddress(rAccount.getServerOrIp().toString(),
+							account.getPort()), Config.SOCKET_TIMEOUT * 1000);
 				} catch (IOException e) {
 					throw new UnknownHostException();
 				}

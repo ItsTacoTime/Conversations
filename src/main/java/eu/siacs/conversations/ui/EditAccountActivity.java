@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.AsyncTask;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -471,8 +472,9 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		/* Account configuration from intent. */
 		Intent intent = getIntent();
 		String action = intent.getAction();
+		action = ACTION_ADD_ACCOUNT;
 		if (action != null && action.equals(ACTION_ADD_ACCOUNT)) {
-			AutoConfigureAccount(intent);
+			new AutoConfigureAccountTask().execute(intent);
 		}
 
 		updateSaveButton();
@@ -507,43 +509,52 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	 * reconfigure the account with new information.
 	 * TODO: Need to add a mechanism for deleting an account.
 	 */
-	protected void AutoConfigureAccount(Intent intent) {
+	private class AutoConfigureAccountTask extends AsyncTask<Intent, Void, Void> {
+		protected Void doInBackground(Intent... intents) {
+			Intent intent = intents[0];
+			String jabberId = intent.getStringExtra(EXTRAS_JID);
+			String jabberIp = intent.getStringExtra(EXTRAS_IP);
+			String jabberPassword = intent.getStringExtra(EXTRAS_PASSWORD);
 
-		String jabber_id = intent.getStringExtra(EXTRAS_JID);
-		String jabber_ip = intent.getStringExtra(EXTRAS_IP);
-		String jabber_password = intent.getStringExtra(EXTRAS_PASSWORD);
-		int jabber_port = intent.getIntExtra(EXTRAS_PORT, 5222);
+			// int jabberPort = intent.getIntExtra(EXTRAS_PORT, 5222); // default port is 5222
+			/* For debugging only using adb */
+			String jabberPortString = intent.getStringExtra(EXTRAS_PORT);
+			Log.v(TAG, "Jabber port string: " + jabberPortString);
+			int jabberPort = Integer.parseInt(jabberPortString);
 
-		Log.v(TAG, "Configuring jabber account for " + jabber_id + " on ip: " + jabber_ip + ":" + jabber_port);
-		final Jid jid;
-		try {
-			jid = Jid.fromString(jabber_id);
-		} catch (final InvalidJidException e) {
-			Log.e(TAG, "Bad jid provided:" + jabber_id);
-			return;
-		}
-		if (mAccount != null) {
+			/* ***************************** */
+
+			Log.v(TAG, "Configuring jabber account for "
+					+ jabberId + " on ip: " + jabberIp + ":" + jabberPort);
+			final Jid jid;
 			try {
-				mAccount.setUsername(jid.hasLocalpart() ? jid.getLocalpart() : "");
-				mAccount.setServer(jid.getDomainpart());
-			} catch (final InvalidJidException ignored) {
-				return;
+				jid = Jid.fromString(jabberId);
+			} catch (final InvalidJidException e) {
+				Log.e(TAG, "Bad jid provided:" + jabberId);
+				return null;
 			}
-			mAccount.setPassword(jabber_password);
-			mAccount.setKey(EXTRAS_IP, jabber_ip);
-			mAccount.setKey(EXTRAS_PORT, "" + jabber_port);
-			xmppConnectionService.updateAccount(mAccount);
-		} else {
-			Log.v(TAG, "Adding account with jid: " + jid);
-			if (xmppConnectionService == null) {
-				Log.e(TAG, "Need to wait for XMPPConnectionService reconnect.");
-				this.connectToBackend();
-				return;
-			}
-			if (xmppConnectionService.findAccountByJid(jid) != null) {
-				Log.e(TAG, "Tried to configure an account which already exists: " + jid);
-				return;
-			}
+			if (mAccount != null) {
+				try {
+					mAccount.setUsername(jid.hasLocalpart() ? jid.getLocalpart() : "");
+					mAccount.setServer(jid.getDomainpart());
+				} catch (final InvalidJidException ignored) {
+					return null;
+				}
+				mAccount.setPassword(jabberPassword);
+				mAccount.setKey(EXTRAS_IP, jabberIp);
+				mAccount.setKey(EXTRAS_PORT, "" + jabberPort);
+				xmppConnectionService.updateAccount(mAccount);
+			} else {
+				Log.v(TAG, "Adding account with jid: " + jid);
+				if (xmppConnectionService == null) {
+					Log.e(TAG, "Need to wait for XMPPConnectionService reconnect.");
+					//this.connectToBackend();
+					return null;
+				}
+				if (xmppConnectionService.findAccountByJid(jid) != null) {
+					Log.e(TAG, "Tried to configure an account which already exists: " + jid);
+					return null;
+				}
 
 			/* The IP and Port in this case are used for auto-configuration of RVMP. IP address
 			 * and Port are NOT required by the XMPP protocol, but in our case will
@@ -551,33 +562,35 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			 * See XMPPConnection.java and AccountRemotium.java for special handling when using
 			 * RVMP auto-configuration.
 			 */
-			JSONObject extras = null;
-			try {
-				extras = new JSONObject();
-				extras.put(EXTRAS_IP, jabber_ip);
-				extras.put(EXTRAS_PORT, "" + jabber_port);
-			} catch (JSONException e) {
-				// Just keeping with the documentation.
-				throw new RuntimeException(e);
-			} finally {
-				if (extras == null) {
-					mAccount = new Account(jid.toBareJid(), jabber_password);
+				JSONObject extras = null;
+				try {
+					extras = new JSONObject();
+					extras.put(EXTRAS_IP, jabberIp);
+					extras.put(EXTRAS_PORT, "" + jabberPort);
+				} catch (JSONException e) {
+					// Just keeping with the documentation.
+					throw new RuntimeException(e);
+				} finally {
+					if (extras == null) {
+						mAccount = new Account(jid.toBareJid(), jabberPassword);
+					} else {
+						mAccount = new AccountRemotium(jid.toBareJid(), jabberPassword, extras.toString());
+					}
 				}
-				else {
-					mAccount = new AccountRemotium(jid.toBareJid(), jabber_password, extras.toString());
-				}
-			}
 
 			/* TODO: TLS and Compression are disabled for now.
 			 *       It will be necessary to fix this in the future. */
-			mAccount.setOption(Account.OPTION_USETLS, false);
-			mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
+				mAccount.setOption(Account.OPTION_USETLS, true);
+				mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
 
-			Log.v(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
-			xmppConnectionService.createAccount(mAccount);
+				Log.v(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
+				xmppConnectionService.createAccount(mAccount);
+			}
+			final Avatar avatar = null;
+			finishInitialSetup(avatar);
+
+			return null;
 		}
-		final Avatar avatar = null;
-		this.finishInitialSetup(avatar);
 
 	}
 

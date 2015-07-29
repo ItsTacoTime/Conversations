@@ -30,6 +30,7 @@ import eu.siacs.conversations.crypto.axolotl.AxolotlService;
 import eu.siacs.conversations.crypto.axolotl.SQLiteAxolotlStore;
 import eu.siacs.conversations.crypto.axolotl.XmppAxolotlSession;
 import eu.siacs.conversations.entities.Account;
+import eu.siacs.conversations.entities.AccountRemotium;
 import eu.siacs.conversations.entities.Contact;
 import eu.siacs.conversations.entities.Conversation;
 import eu.siacs.conversations.entities.Message;
@@ -441,7 +442,12 @@ public class DatabaseBackend extends SQLiteOpenHelper {
 		Cursor cursor = db.query(Account.TABLENAME, null, null, null, null,
 				null, null);
 		while (cursor.moveToNext()) {
-			list.add(Account.fromCursor(cursor));
+			/* Restore to subclass not parent class to provide overloading
+			 * Otherwise special handling for IP address or port would not work/
+			 *  See AccountRemotium.java:fromCursor()
+			 */
+			//list.add(Account.fromCursor(cursor));
+			list.add(AccountRemotium.fromCursor(cursor));
 		}
 		cursor.close();
 		return list;

@@ -177,6 +177,7 @@ public class DNSHelper {
 		} catch (Exception e) {
 			bundle.putString("error", "unhandled");
 		}
+		Log.v(Config.LOGTAG, "" + bundle.toString());
 		return bundle;
 	}
 

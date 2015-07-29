@@ -1,5 +1,6 @@
 package eu.siacs.conversations.entities;
 
+import android.database.Cursor;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -11,13 +12,13 @@ import eu.siacs.conversations.xmpp.jid.Jid;
  * Created by hlew on 7/23/15.
  */
 public class AccountRemotium extends Account {
-    private static final String TAG = "AccountRemotium";
+    private static final String LOG_TAG = "AccountRemotium";
 
     /* Keep in sync with EditAccountActivity.java and AccManager.java */
     private static final String EXTRAS_IP = "jabber_ip";
 
     /**
-     * Constructs {@code Account} from parent class constructor.
+     * Constructs {@code Account} from parent constructor.
      *
      */
     public AccountRemotium() {
@@ -25,7 +26,7 @@ public class AccountRemotium extends Account {
     }
 
     /**
-     * Constructs {@code Account} from parent class constructor.
+     * Constructs {@code Account} from parent constructor.
      *
      * @param jid
      * @param password
@@ -35,7 +36,7 @@ public class AccountRemotium extends Account {
     }
 
     /**
-     * Creates a new {@code Account} with key/value mappings from the JSON
+     * Constructor creates an {@code Account} with key/value mappings from the JSON
      * string.
      *
      * @param jid a Jid object describing a jabber account.
@@ -48,7 +49,16 @@ public class AccountRemotium extends Account {
                 password, 0, null, keys, null);
     }
 
-    @Override
+    /**
+     * Constructor maps to {@code Account} from parent constructor.
+     *
+     */
+    public AccountRemotium(final String uuid, final Jid jid,
+                   final String password, final int options, final String rosterVersion, final String keys,
+                   final String avatar) {
+        super(uuid, jid, password, options, rosterVersion, keys, avatar);
+    }
+
     /**
      * Returns a {@code Jid} of the {@code AccountRemotium} instance. Remotium accounts
      * will have either an IP address or DNS name as the domain part, so the
@@ -56,10 +66,10 @@ public class AccountRemotium extends Account {
      * This will allow over-riding of standard DNS lookup behavior.
      * See XmppConnection.java for special handling of Remotium accounts.
      *
-     * @return      the corresponding jid as an IP address if provided.
+     * @return Jid  The corresponding Jid as an IP address if provided.
      *
      */
-    public Jid getServer() {
+    public Jid getServerOrIp() {
         final JSONObject keys = super.getKeys();
         if (keys.has("jabber_ip")) {
             String ip_address = null;
@@ -79,7 +89,10 @@ public class AccountRemotium extends Account {
     /**
      * Returns a {@code Jid} with IP address replacing the domain part.
      *
-     * @return      the corresponding jid for the AccountRemotium.
+     * @return Jid  The corresponding Domain Jid for the AccountRemotium.
+     *              If an IP address is available, this replaces the domain part.
+     *              example: test@example.com with an ip address 1.1.1.1
+     *                       will be converted to test@1.1.1.1.com
      *
      */
     public Jid getJid(String ipAddress) {
@@ -87,7 +100,7 @@ public class AccountRemotium extends Account {
         try {
             jid = Jid.fromParts(super.getJid().getLocalpart(), ipAddress, super.getJid().getDomainpart());
         } catch (InvalidJidException e) {
-            Log.e(TAG, "Invalid Jid conversion to IP: " + e);
+            Log.e(LOG_TAG, "Invalid Jid conversion to IP: " + e);
             jid = null;
         }
 
@@ -97,10 +110,10 @@ public class AccountRemotium extends Account {
 
     @Override
     /**
-     *  Extracts the port number from {@AccountRemotium} in the key/value
+     * Extracts the port number from {@AccountRemotium} in the key/value
      * store. The value only exists if it was sent through an intent.
      *
-     * @return int The port tied to the account.
+     * @return int The port configured to the account.
      */
     public int getPort() {
         final JSONObject keys = super.getKeys();
@@ -108,22 +121,44 @@ public class AccountRemotium extends Account {
             int port;
             try {
                 port = Integer.valueOf(keys.getString("jabber_port"));
+
                 /* Validate the port. */
-                if ((port > 0) && (port < 65535)) {
+                if (port <= 0 && port > 65535) {
                     port = super.getPort();
                 }
             } catch (JSONException ignored) {
-                // this should never happen
+                Log.e(LOG_TAG, "JSONException", ignored);
                 port= super.getPort();
-            } catch (ClassCastException notInt) {
-                port = super.getPort(); // Try the default port
-            } catch (NullPointerException nullobject) {
-                port = super.getPort();
             }
+            Log.v(LOG_TAG, "Using custom port: " + port);
             return port;
         }
 
         return super.getPort();
+    }
+
+    /* Returns an {@code Account} for compatibility with the original
+     * Conversations application. To preserve overloading, we need to create
+     * AccountRemotium instead of Account during backend data saving and restoration.
+     * See DatabaseBackend.java for edits.
+     *
+     *  @param  Cursor  Sqlite database cursor for Accounts.
+     *  @return Account Instantiates a new {@code AccountRemotium}
+     */
+    public static Account fromCursor(final Cursor cursor) {
+        Jid jid = null;
+        try {
+            jid = Jid.fromParts(cursor.getString(cursor.getColumnIndex(USERNAME)),
+                    cursor.getString(cursor.getColumnIndex(SERVER)), "mobile");
+        } catch (final InvalidJidException ignored) {
+        }
+        return new AccountRemotium(cursor.getString(cursor.getColumnIndex(UUID)),
+                jid,
+                cursor.getString(cursor.getColumnIndex(PASSWORD)),
+                cursor.getInt(cursor.getColumnIndex(OPTIONS)),
+                cursor.getString(cursor.getColumnIndex(ROSTERVERSION)),
+                cursor.getString(cursor.getColumnIndex(KEYS)),
+                cursor.getString(cursor.getColumnIndex(AVATAR)));
     }
 
 }
