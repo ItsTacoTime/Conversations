@@ -635,7 +635,7 @@ public class ConversationActivity extends XmppActivity
 	@SuppressLint("InflateParams")
 	protected void clearHistoryDialog(final Conversation conversation) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.clear_conversation_history_remotium);
+		builder.setTitle(getString(R.string.clear_conversation_history_remotium));
 		View dialogView = getLayoutInflater().inflate(
 				R.layout.dialog_clear_history, null);
 		final CheckBox endConversationCheckBox = (CheckBox) dialogView

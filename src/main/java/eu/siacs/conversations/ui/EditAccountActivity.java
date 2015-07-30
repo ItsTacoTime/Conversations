@@ -4,10 +4,11 @@ import android.app.AlertDialog.Builder;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +26,6 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.util.Log;
 
 import java.util.Set;
 
@@ -47,6 +47,7 @@ import eu.siacs.conversations.xmpp.jid.InvalidJidException;
 import eu.siacs.conversations.xmpp.jid.Jid;
 import eu.siacs.conversations.xmpp.pep.Avatar;
 
+
 public class EditAccountActivity extends XmppActivity implements OnAccountUpdate, OnKeyStatusUpdated {
 	private static final String TAG = "EditAccount";
 
@@ -60,12 +61,18 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	private AutoCompleteTextView mAccountJid;
 	private EditText mPassword;
 	private EditText mPasswordConfirm;
+	private EditText mAdvancedSettingServer;
+	private EditText mAdvancedSettingPort;
 	private CheckBox mRegisterNew;
+	private CheckBox mAdvancedOptions;
+	private CheckBox mUseTLS;
 	private Button mCancelButton;
 	private Button mSaveButton;
 	private TableLayout mMoreTable;
 
 	private LinearLayout mStats;
+	private TextView mAdvancedServerInfo;
+	private TextView mAdvancedPortInfo;
 	private TextView mServerInfoSm;
 	private TextView mServerInfoRosterVersion;
 	private TextView mServerInfoCarbons;
@@ -103,11 +110,14 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				return;
 			}
 			final boolean registerNewAccount = mRegisterNew.isChecked() && !Config.DISALLOW_REGISTRATION_IN_UI;
+			final boolean useAdvancedOptions = mAdvancedOptions.isChecked();
+			final boolean useTLS = mUseTLS.isChecked();
 			if (Config.DOMAIN_LOCK != null && mAccountJid.getText().toString().contains("@")) {
 				mAccountJid.setError(getString(R.string.invalid_username));
 				mAccountJid.requestFocus();
 				return;
 			}
+
 			final Jid jid;
 			try {
 				if (Config.DOMAIN_LOCK != null) {
@@ -142,7 +152,14 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 					return;
 				}
 			}
+			final String server = mAdvancedSettingServer.getText().toString();
+			final String port = mAdvancedSettingPort.getText().toString();
+
 			if (mAccount != null) {
+				if (useAdvancedOptions) {
+						mAccount.setKey(EXTRAS_IP, !server.isEmpty() ? server : null);
+						mAccount.setKey(EXTRAS_PORT, !port.isEmpty() ? port: null);
+				}
 				try {
 					mAccount.setUsername(jid.hasLocalpart() ? jid.getLocalpart() : "");
 					mAccount.setServer(jid.getDomainpart());
@@ -153,6 +170,8 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				mPasswordConfirm.setError(null);
 				mAccount.setPassword(password);
 				mAccount.setOption(Account.OPTION_REGISTER, registerNewAccount);
+				mAccount.setOption(Account.OPTION_USETLS, useTLS);
+
 				xmppConnectionService.updateAccount(mAccount);
 			} else {
 				if (xmppConnectionService.findAccountByJid(jid) != null) {
@@ -160,9 +179,16 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 					mAccountJid.requestFocus();
 					return;
 				}
-				//mAccount = new Account(jid.toBareJid(), password);
+
+				/* Before adding Remotium accounts
+				mAccount = new Account(jid.toBareJid(), password);
+				*/
 				mAccount = new AccountRemotium(jid.toBareJid(), password);
-				mAccount.setOption(Account.OPTION_USETLS, true);
+				if (useAdvancedOptions) {
+					mAccount.setKey(EXTRAS_IP, !server.isEmpty() ? server : null);
+					mAccount.setKey(EXTRAS_PORT, !port.isEmpty() ? port : null);
+				}
+				mAccount.setOption(Account.OPTION_USETLS, useTLS);
 				mAccount.setOption(Account.OPTION_USECOMPRESSION, true);
 				mAccount.setOption(Account.OPTION_REGISTER, registerNewAccount);
 				xmppConnectionService.createAccount(mAccount);
@@ -324,7 +350,32 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			unmodified = this.mAccount.getJid().toBareJid().toString();
 		}
 		return !unmodified.equals(this.mAccountJid.getText().toString()) ||
-				!this.mAccount.getPassword().equals(this.mPassword.getText().toString());
+				!this.mAccount.getPassword().equals(this.mPassword.getText().toString())
+				|| !getIpExtra().equals(
+				this.mAdvancedSettingServer.getText().toString())
+				|| !getPortExtra().equals(
+				this.mAdvancedSettingPort.getText().toString())
+				|| !(this.mAccount.isOptionSet(Account.OPTION_USETLS) ==
+				this.mUseTLS.isChecked());
+	}
+
+	private String getIpExtra() {
+		String server;
+		try {
+			server = this.mAccount.getKeys().getString(EXTRAS_IP);
+		} catch (JSONException e) {
+			server = "";
+		}
+		return server;
+	}
+	private String getPortExtra() {
+		String port;
+		try {
+			port = this.mAccount.getKeys().getString(EXTRAS_PORT);
+		} catch (JSONException e) {
+			port = "";
+		}
+		return port;
 	}
 
 	@Override
@@ -350,9 +401,17 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		this.mPassword = (EditText) findViewById(R.id.account_password);
 		this.mPassword.addTextChangedListener(this.mTextWatcher);
 		this.mPasswordConfirm = (EditText) findViewById(R.id.account_password_confirm);
+		this.mAdvancedSettingServer = (EditText) findViewById(R.id.account_server_setting);
+		this.mAdvancedSettingServer.addTextChangedListener(this.mTextWatcher);
+		this.mAdvancedSettingPort = (EditText) findViewById(R.id.account_port_setting);
+		this.mAdvancedSettingPort.addTextChangedListener(this.mTextWatcher);
+		this.mAdvancedServerInfo = (TextView) findViewById(R.id.account_server_desc);
+		this.mAdvancedPortInfo = (TextView) findViewById(R.id.account_port_desc);
 		this.mAvatar = (ImageView) findViewById(R.id.avater);
 		this.mAvatar.setOnClickListener(this.mAvatarClickListener);
 		this.mRegisterNew = (CheckBox) findViewById(R.id.account_register_new);
+		this.mAdvancedOptions = (CheckBox) findViewById(R.id.account_settings_advanced_settings);
+		this.mUseTLS = (CheckBox) findViewById(R.id.account_use_tls);
 		this.mStats = (LinearLayout) findViewById(R.id.stats);
 		this.mSessionEst = (TextView) findViewById(R.id.session_est);
 		this.mServerInfoRosterVersion = (TextView) findViewById(R.id.server_info_roster_version);
@@ -390,10 +449,41 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				updateSaveButton();
 			}
 		};
+		final OnCheckedChangeListener OnCheckedShowAdvancedSettings = new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(final CompoundButton buttonView,
+										 final boolean isChecked) {
+				if (isChecked) {
+					mAdvancedServerInfo.setVisibility(View.VISIBLE);
+					mAdvancedSettingServer.setVisibility(View.VISIBLE);
+					mAdvancedPortInfo.setVisibility(View.VISIBLE);
+					mAdvancedSettingPort.setVisibility(View.VISIBLE);
+					mUseTLS.setVisibility(View.VISIBLE);
+				} else {
+					mAdvancedServerInfo.setVisibility(View.GONE);
+					mAdvancedSettingServer.setVisibility(View.GONE);
+					mAdvancedPortInfo.setVisibility(View.GONE);
+					mAdvancedSettingPort.setVisibility(View.GONE);
+					mUseTLS.setVisibility(View.GONE);
+				}
+				updateSaveButton();
+			}
+
+		};
+		final OnCheckedChangeListener OnCheckedUseTls = new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(final CompoundButton buttonView,
+										 final boolean isChecked) {
+				updateSaveButton();
+			}
+
+		};
 		this.mRegisterNew.setOnCheckedChangeListener(OnCheckedShowConfirmPassword);
 		if (Config.DISALLOW_REGISTRATION_IN_UI) {
 			this.mRegisterNew.setVisibility(View.GONE);
 		}
+		this.mAdvancedOptions.setOnCheckedChangeListener(OnCheckedShowAdvancedSettings);
+		this.mUseTLS.setOnCheckedChangeListener(OnCheckedUseTls);
 	}
 
 	@Override
@@ -474,9 +564,9 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		/* Account configuration from intent. */
 		Intent intent = getIntent();
 		String action = intent.getAction();
-		action = ACTION_ADD_ACCOUNT;
 		if (action != null && action.equals(ACTION_ADD_ACCOUNT)) {
 			new AutoConfigureAccountTask().execute(intent);
+			finish();
 		}
 
 		updateSaveButton();
@@ -549,13 +639,13 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			String jabberId = intent.getStringExtra(EXTRAS_JID);
 			String jabberIp = intent.getStringExtra(EXTRAS_IP);
 			String jabberPassword = intent.getStringExtra(EXTRAS_PASSWORD);
-			boolean jabberUseTls = intent.getBooleanExtra(EXTRAS_USE_TLS, false);
+			boolean jabberUseTls = intent.getBooleanExtra(EXTRAS_USE_TLS, true);
+			int jabberPort = intent.getIntExtra(EXTRAS_PORT, 13001); // default port is 5222
 
-			// int jabberPort = intent.getIntExtra(EXTRAS_PORT, 5222); // default port is 5222
 			/* For debugging only using adb */
 			String jabberPortString = intent.getStringExtra(EXTRAS_PORT);
 			Log.v(TAG, "Jabber port string: " + jabberPortString);
-			int jabberPort = Integer.parseInt(jabberPortString);
+			//int jabberPort = Integer.parseInt(jabberPortString);
 			/* ***************************** */
 
 			Log.v(TAG, "Configuring jabber account for "
@@ -588,9 +678,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 					mAccount = new AccountRemotium(jid.toBareJid(), jabberPassword, extras.toString());
 				}
 			}
-
-			/* TODO: Compression is disabled for now. Do we need it?
-			 *       It will be necessary to fix this in the future. */
+			/* TODO: Note that compression is disabled for now */
 			mAccount.setOption(Account.OPTION_USETLS, jabberUseTls);
 			mAccount.setOption(Account.OPTION_USECOMPRESSION, false);
 		}
@@ -606,6 +694,18 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			}
 			this.mPassword.setText(this.mAccount.getPassword());
 		}
+		AccountRemotium rAccount = (AccountRemotium) mAccount;
+		this.mAccountJid.setTextKeepState(this.mAccount.getJid().toBareJid().toString());
+		this.mPassword.setTextKeepState(this.mAccount.getPassword());
+		if (getIpExtra().isEmpty() && getPortExtra().isEmpty()) {
+			mAdvancedOptions.setChecked(false);
+		}
+		else {
+			mAdvancedOptions.setChecked(true);
+		}
+		this.mAdvancedSettingServer.setTextKeepState(getIpExtra());
+		this.mAdvancedSettingPort.setTextKeepState(getPortExtra());
+		this.mUseTLS.setChecked(this.mAccount.isOptionSet(Account.OPTION_USETLS));
 
 		if (this.jidToEdit != null) {
 			this.mAvatar.setVisibility(View.VISIBLE);

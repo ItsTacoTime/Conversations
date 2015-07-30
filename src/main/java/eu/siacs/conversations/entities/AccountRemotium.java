@@ -28,8 +28,8 @@ public class AccountRemotium extends Account {
     /**
      * Constructs {@code Account} from parent constructor.
      *
-     * @param jid
-     * @param password
+     * @param jid a Jid object describing a jabber account.
+     * @param password a string containing a password
      */
     public AccountRemotium(final Jid jid, final String password) {
         super(jid, password);
@@ -52,6 +52,8 @@ public class AccountRemotium extends Account {
     /**
      * Constructor maps to {@code Account} from parent constructor.
      *
+     * See parent.
+     *
      */
     public AccountRemotium(final String uuid, final Jid jid,
                    final String password, final int options, final String rosterVersion, final String keys,
@@ -63,7 +65,7 @@ public class AccountRemotium extends Account {
      * Returns a {@code Jid} of the {@code AccountRemotium} instance. Remotium accounts
      * will have either an IP address or DNS name as the domain part, so the
      * key/value store of the parent {@code Account} is checked for an IP address.
-     * This will allow over-riding of standard DNS lookup behavior.
+     * This will allow avoiding the standard DNS lookup behavior.
      * See XmppConnection.java for special handling of Remotium accounts.
      *
      * @return Jid  The corresponding Jid as an IP address if provided.
@@ -93,9 +95,8 @@ public class AccountRemotium extends Account {
      *              If an IP address is available, this replaces the domain part.
      *              example: test@example.com with an ip address 1.1.1.1
      *                       will be converted to test@1.1.1.1.com
-     *
      */
-    public Jid getJid(String ipAddress) {
+    private Jid getJid(String ipAddress) {
         Jid jid;
         try {
             jid = Jid.fromParts(super.getJid().getLocalpart(), ipAddress, super.getJid().getDomainpart());

@@ -189,8 +189,11 @@
 	<string name="account_settings_confirm_password">Confirm password</string>
 	<string name="account_settings_advanced_settings">Advanced settings</string>
 	<string name="account_settings_server">Server</string>
-	<String name="account_settings_port">Port</String>
-	<String name="account_settings_example_port">5222</String>
+	<string name="account_settings_example_server">example.com</string>
+	<string name="account_settings_port">Port</string>
+	<string name="account_settings_example_port">5222</string>
+	<string name="account_settings_use_tls">Use SSL/TLS</string>
+	<string name="unknown_host">Unknown host</string>
 	<string name="password">Password</string>
 	<string name="confirm_password">Confirm password</string>
 	<string name="passwords_do_not_match">Passwords do not match</string>
