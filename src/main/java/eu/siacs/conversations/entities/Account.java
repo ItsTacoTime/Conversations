@@ -206,6 +206,11 @@ public class Account extends AbstractEntity {
 		return jid.toDomainJid();
 	}
 
+	public Jid getServer(String extras) {
+		return this.getServer();
+	}
+
+
 	public int getPort() {
 		return XMPP_CLIENT_PORT;
 	}

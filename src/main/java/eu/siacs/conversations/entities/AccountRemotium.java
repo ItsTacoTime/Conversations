@@ -6,6 +6,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eu.siacs.conversations.Config;
 import eu.siacs.conversations.xmpp.jid.InvalidJidException;
 import eu.siacs.conversations.xmpp.jid.Jid;
 /**
@@ -13,9 +14,6 @@ import eu.siacs.conversations.xmpp.jid.Jid;
  */
 public class AccountRemotium extends Account {
     private static final String LOG_TAG = "AccountRemotium";
-
-    /* Keep in sync with EditAccountActivity.java and AccManager.java */
-    private static final String EXTRAS_IP = "jabber_ip";
 
     /**
      * Constructs {@code Account} from parent constructor.
@@ -68,15 +66,16 @@ public class AccountRemotium extends Account {
      * This will allow avoiding the standard DNS lookup behavior.
      * See XmppConnection.java for special handling of Remotium accounts.
      *
+     * @param extras Key to check for in key-value store. See XmppConnection.java
      * @return Jid  The corresponding Jid as an IP address if provided.
      *
      */
-    public Jid getServerOrIp() {
+    public Jid getServer(String extras) {
         final JSONObject keys = super.getKeys();
-        if (keys.has("jabber_ip")) {
+        if (keys.has(extras)) {
             String ip_address = null;
             try {
-                ip_address = keys.getString("jabber_ip");
+                ip_address = keys.getString(extras);
             } catch (JSONException ignored) {
                 // this should never happen
             }
@@ -94,7 +93,7 @@ public class AccountRemotium extends Account {
      * @return Jid  The corresponding Domain Jid for the AccountRemotium.
      *              If an IP address is available, this replaces the domain part.
      *              example: test@example.com with an ip address 1.1.1.1
-     *                       will be converted to test@1.1.1.1.com
+     *                       will be converted to a Jid test@1.1.1.1.com
      */
     private Jid getJid(String ipAddress) {
         Jid jid;
@@ -118,10 +117,10 @@ public class AccountRemotium extends Account {
      */
     public int getPort() {
         final JSONObject keys = super.getKeys();
-        if (keys.has("jabber_port")) {
+        if (keys.has(Config.EXTRAS_PORT)) {
             int port;
             try {
-                port = Integer.valueOf(keys.getString("jabber_port"));
+                port = Integer.valueOf(keys.getString(Config.EXTRAS_PORT));
 
                 /* Validate the port. */
                 if (port <= 0 && port > 65535) {
@@ -139,7 +138,7 @@ public class AccountRemotium extends Account {
     }
 
     /* Returns an {@code Account} for compatibility with the original
-     * Conversations application. To preserve overloading, we need to create
+     * Conversations application. To allow overriding, we need to create
      * AccountRemotium instead of Account during backend data saving and restoration.
      * See DatabaseBackend.java for edits.
      *

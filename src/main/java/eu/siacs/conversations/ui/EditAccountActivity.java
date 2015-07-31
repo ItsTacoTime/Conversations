@@ -32,6 +32,7 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eu.siacs.conversations.Config;
 import eu.siacs.conversations.R;
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.crypto.axolotl.AxolotlService;
@@ -50,13 +51,6 @@ import eu.siacs.conversations.xmpp.pep.Avatar;
 
 public class EditAccountActivity extends XmppActivity implements OnAccountUpdate, OnKeyStatusUpdated {
 	private static final String TAG = "EditAccount";
-
-	private static final String ACTION_ADD_ACCOUNT = "eu.siacs.conversations.ADD_ACCOUNT";
-	private static final String EXTRAS_JID = "jabber_id";
-	private static final String EXTRAS_IP = "jabber_ip";
-	private static final String EXTRAS_PASSWORD = "jabber_password";
-	private static final String EXTRAS_PORT = "jabber_port";
-	private static final String EXTRAS_USE_TLS = "jabber_use_tls";
 
 	private AutoCompleteTextView mAccountJid;
 	private EditText mPassword;
@@ -157,8 +151,8 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 
 			if (mAccount != null) {
 				if (useAdvancedOptions) {
-						mAccount.setKey(EXTRAS_IP, !server.isEmpty() ? server : null);
-						mAccount.setKey(EXTRAS_PORT, !port.isEmpty() ? port: null);
+						mAccount.setKey(Config.EXTRAS_IP, !server.isEmpty() ? server : null);
+						mAccount.setKey(Config.EXTRAS_PORT, !port.isEmpty() ? port: null);
 				}
 				try {
 					mAccount.setUsername(jid.hasLocalpart() ? jid.getLocalpart() : "");
@@ -185,8 +179,8 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				*/
 				mAccount = new AccountRemotium(jid.toBareJid(), password);
 				if (useAdvancedOptions) {
-					mAccount.setKey(EXTRAS_IP, !server.isEmpty() ? server : null);
-					mAccount.setKey(EXTRAS_PORT, !port.isEmpty() ? port : null);
+					mAccount.setKey(Config.EXTRAS_IP, !server.isEmpty() ? server : null);
+					mAccount.setKey(Config.EXTRAS_PORT, !port.isEmpty() ? port : null);
 				}
 				mAccount.setOption(Account.OPTION_USETLS, useTLS);
 				mAccount.setOption(Account.OPTION_USECOMPRESSION, true);
@@ -359,23 +353,14 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				this.mUseTLS.isChecked());
 	}
 
-	private String getIpExtra() {
-		String server;
+	private String getExtra(String key) {
+		String value;
 		try {
-			server = this.mAccount.getKeys().getString(EXTRAS_IP);
+			value = this.mAccount.getKeys().getString(key);
 		} catch (JSONException e) {
-			server = "";
+			value = "";
 		}
-		return server;
-	}
-	private String getPortExtra() {
-		String port;
-		try {
-			port = this.mAccount.getKeys().getString(EXTRAS_PORT);
-		} catch (JSONException e) {
-			port = "";
-		}
-		return port;
+		return value;
 	}
 
 	@Override
@@ -564,7 +549,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		/* Account configuration from intent. */
 		Intent intent = getIntent();
 		String action = intent.getAction();
-		if (action != null && action.equals(ACTION_ADD_ACCOUNT)) {
+		if (action != null && action.equals(Config.ACTION_ADD_ACCOUNT)) {
 			new AutoConfigureAccountTask().execute(intent);
 			finish();
 		}
@@ -636,14 +621,14 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 
 		private void populateAccountFromIntent(Intent intent) {
 
-			String jabberId = intent.getStringExtra(EXTRAS_JID);
-			String jabberIp = intent.getStringExtra(EXTRAS_IP);
-			String jabberPassword = intent.getStringExtra(EXTRAS_PASSWORD);
-			boolean jabberUseTls = intent.getBooleanExtra(EXTRAS_USE_TLS, true);
-			int jabberPort = intent.getIntExtra(EXTRAS_PORT, 13001); // default port is 5222
+			String jabberId = intent.getStringExtra(Config.EXTRAS_JID);
+			String jabberIp = intent.getStringExtra(Config.EXTRAS_IP);
+			String jabberPassword = intent.getStringExtra(Config.EXTRAS_PASSWORD);
+			boolean jabberUseTls = intent.getBooleanExtra(Config.EXTRAS_USE_TLS, true);
+
 
 			/* For debugging only using adb */
-			String jabberPortString = intent.getStringExtra(EXTRAS_PORT);
+			String jabberPortString = intent.getStringExtra(Config.EXTRAS_PORT);
 			Log.v(TAG, "Jabber port string: " + jabberPortString);
 			//int jabberPort = Integer.parseInt(jabberPortString);
 			/* ***************************** */
@@ -666,8 +651,8 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			JSONObject extras = null;
 			try {
 				extras = new JSONObject();
-				extras.put(EXTRAS_IP, jabberIp);
-				extras.put(EXTRAS_PORT, "" + jabberPort);
+				extras.put(Config.EXTRAS_IP, jabberIp);
+				extras.put(Config.EXTRAS_PORT, "" + jabberPort);
 			} catch (JSONException e) {
 				// Just keeping with the documentation.
 				throw new RuntimeException(e);
@@ -697,14 +682,14 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		AccountRemotium rAccount = (AccountRemotium) mAccount;
 		this.mAccountJid.setTextKeepState(this.mAccount.getJid().toBareJid().toString());
 		this.mPassword.setTextKeepState(this.mAccount.getPassword());
-		if (getIpExtra().isEmpty() && getPortExtra().isEmpty()) {
+		if (getExtra(Config.EXTRAS_IP).isEmpty() && getExtra(Config.EXTRAS_PORT).isEmpty()) {
 			mAdvancedOptions.setChecked(false);
 		}
 		else {
 			mAdvancedOptions.setChecked(true);
 		}
-		this.mAdvancedSettingServer.setTextKeepState(getIpExtra());
-		this.mAdvancedSettingPort.setTextKeepState(getPortExtra());
+		this.mAdvancedSettingServer.setTextKeepState(getExtra(Config.EXTRAS_IP));
+		this.mAdvancedSettingPort.setTextKeepState(getExtra(Config.EXTRAS_PORT));
 		this.mUseTLS.setChecked(this.mAccount.isOptionSet(Account.OPTION_USETLS));
 
 		if (this.jidToEdit != null) {

@@ -49,7 +49,7 @@ import eu.siacs.conversations.crypto.sasl.SaslMechanism;
 import eu.siacs.conversations.crypto.sasl.ScramSha1;
 import eu.siacs.conversations.entities.Account;
 import eu.siacs.conversations.entities.Message;
-import eu.siacs.conversations.entities.AccountRemotium;
+
 import eu.siacs.conversations.generator.IqGenerator;
 import eu.siacs.conversations.services.XmppConnectionService;
 import eu.siacs.conversations.utils.CryptoHelper;
@@ -142,8 +142,6 @@ public class XmppConnection implements Runnable {
 	}
 
 	protected void connect() {
-		/* To allow overloaded getPorts() to return a custom port. */
-		AccountRemotium rAccount = (AccountRemotium) account;
 		Log.d(Config.LOGTAG, account.getJid().toBareJid().toString() + ": connecting");
 		features.encryptionEnabled = false;
 		lastConnect = SystemClock.elapsedRealtime();
@@ -159,11 +157,11 @@ public class XmppConnection implements Runnable {
 			 * lookup behavior. If no IP was provided, it returns the superclass domain for standard
 			 * lookup.
 			 */
-			if (DNSHelper.isIp(rAccount.getServerOrIp().toString())) {
+			if (DNSHelper.isIp(account.getServer(Config.EXTRAS_IP).toString())) {
 				socket = new Socket();
 				try {
 					/* getServerOrIP() has also been used here during connect */
-					socket.connect(new InetSocketAddress(rAccount.getServerOrIp().toString(),
+					socket.connect(new InetSocketAddress(account.getServer(Config.EXTRAS_IP).toString(),
 							account.getPort()), Config.SOCKET_TIMEOUT * 1000);
 				} catch (IOException e) {
 					throw new UnknownHostException();
