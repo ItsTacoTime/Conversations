@@ -30,6 +30,7 @@ import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Toast;
 
+import com.melnykov.fab.FloatingActionButton;
 import net.java.otr4j.session.SessionStatus;
 
 import java.util.ArrayList;
@@ -160,6 +161,7 @@ public class ConversationActivity extends XmppActivity
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		if (savedInstanceState != null) {
 			mOpenConverstaion = savedInstanceState.getString(STATE_OPEN_CONVERSATION, null);
 			mPanelOpen = savedInstanceState.getBoolean(STATE_PANEL_OPEN, true);
@@ -190,7 +192,7 @@ public class ConversationActivity extends XmppActivity
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View clickedView,
-					int position, long arg3) {
+									int position, long arg3) {
 				if (getSelectedConversation() != conversationList.get(position)) {
 					setSelectedConversation(conversationList.get(position));
 					ConversationActivity.this.mConversationFragment.reInit(getSelectedConversation());
@@ -266,6 +268,16 @@ public class ConversationActivity extends XmppActivity
 		listView.setUndoStyle(EnhancedListView.UndoStyle.SINGLE_POPUP);
 		listView.setUndoHideDelay(5000);
 		listView.setRequireTouchBeforeDismiss(false);
+		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+		fab.attachToListView(listView);
+		fab.show();
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ConversationActivity.this, StartConversationActivity.class);
+				startActivity(intent);
+			}
+		});
 
 		mContentView = findViewById(R.id.content_view_spl);
 		if (mContentView == null) {

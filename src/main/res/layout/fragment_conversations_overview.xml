@@ -1,9 +1,10 @@
 <android.support.v4.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content_view_spl"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
+    <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="@dimen/conversations_overview_width"
         android:layout_height="match_parent"
@@ -17,7 +18,18 @@
             android:background="@color/primarybackground"
             android:divider="@color/divider"
             android:dividerHeight="1dp" />
-    </LinearLayout>
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/fab"
+            fab:fab_type="normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_action_new"
+            fab:fab_colorNormal="@color/primary" />
+    </FrameLayout>
+
 
     <LinearLayout
         android:id="@+id/selected_conversation"
