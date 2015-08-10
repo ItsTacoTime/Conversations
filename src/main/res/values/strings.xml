@@ -27,7 +27,7 @@
 	<string name="title_activity_sharewith">Share with Conversation</string>
 	<string name="title_activity_sharewith_remotium">Share with Message</string>
 	<string name="title_activity_start_conversation">Start Conversation</string>
-	<string name="title_activity_start_conversation_remotium">Start Message</string>
+	<string name="title_activity_start_conversation_remotium">New Message</string>
 	<string name="title_activity_choose_contact">Choose contact</string>
 	<string name="title_activity_block_list">Block list</string>
 	<string name="just_now">just now</string>
@@ -56,7 +56,7 @@
 	<string name="change_password_on_server">Change password on server</string>
 	<string name="share_with">Share with…</string>
 	<string name="start_conversation">Start Conversation</string>
-	<string name="start_conversation_remotium">Start Message</string>
+	<string name="start_conversation_remotium">New Message</string>
 	<string name="invite_contact">Invite Contact</string>
 	<string name="contacts">Contacts</string>
 	<string name="cancel">Cancel</string>
