@@ -31,6 +31,7 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
+
 import net.java.otr4j.session.SessionStatus;
 
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ import eu.siacs.conversations.services.XmppConnectionService.OnConversationUpdat
 import eu.siacs.conversations.services.XmppConnectionService.OnRosterUpdate;
 import eu.siacs.conversations.ui.adapter.ConversationAdapter;
 import eu.siacs.conversations.utils.ExceptionHelper;
+import eu.siacs.conversations.utils.WrappingSlidingPaneLayout;
 import eu.siacs.conversations.xmpp.OnUpdateBlocklist;
 import eu.siacs.conversations.xmpp.jid.InvalidJidException;
 import eu.siacs.conversations.xmpp.jid.Jid;
@@ -94,7 +96,7 @@ public class ConversationActivity extends XmppActivity
 	private boolean conversationWasSelectedByKeyboard = false;
 
 	private View mContentView;
-
+	private View mActionBarTitleBox;
 	private List<Conversation> conversationList = new ArrayList<>();
 	private Conversation swipedConversation = null;
 	private Conversation mSelectedConversation = null;
@@ -108,6 +110,15 @@ public class ConversationActivity extends XmppActivity
 	private boolean mActivityPaused = false;
 	private boolean mRedirected = true;
 
+
+	private final View.OnClickListener mActionBarTitleListener = new View.OnClickListener() {
+
+		@Override
+		public void onClick(final View v) {
+			ConversationActivity.this.showConversationsOverview();
+		}
+	};
+
 	public Conversation getSelectedConversation() {
 		return this.mSelectedConversation;
 	}
@@ -117,8 +128,8 @@ public class ConversationActivity extends XmppActivity
 	}
 
 	public void showConversationsOverview() {
-		if (mContentView instanceof SlidingPaneLayout) {
-			SlidingPaneLayout mSlidingPaneLayout = (SlidingPaneLayout) mContentView;
+		if (mContentView instanceof WrappingSlidingPaneLayout) {
+			WrappingSlidingPaneLayout mSlidingPaneLayout = (WrappingSlidingPaneLayout) mContentView;
 			mSlidingPaneLayout.openPane();
 		}
 	}
@@ -134,15 +145,15 @@ public class ConversationActivity extends XmppActivity
 	}
 
 	public void hideConversationsOverview() {
-		if (mContentView instanceof SlidingPaneLayout) {
-			SlidingPaneLayout mSlidingPaneLayout = (SlidingPaneLayout) mContentView;
+		if (mContentView instanceof WrappingSlidingPaneLayout) {
+			WrappingSlidingPaneLayout mSlidingPaneLayout = (WrappingSlidingPaneLayout) mContentView;
 			mSlidingPaneLayout.closePane();
 		}
 	}
 
 	public boolean isConversationsOverviewHideable() {
-		if (mContentView instanceof SlidingPaneLayout) {
-			SlidingPaneLayout mSlidingPaneLayout = (SlidingPaneLayout) mContentView;
+		if (mContentView instanceof WrappingSlidingPaneLayout) {
+			WrappingSlidingPaneLayout mSlidingPaneLayout = (WrappingSlidingPaneLayout) mContentView;
 			return mSlidingPaneLayout.isSlideable();
 		} else {
 			return false;
@@ -150,8 +161,8 @@ public class ConversationActivity extends XmppActivity
 	}
 
 	public boolean isConversationsOverviewVisable() {
-		if (mContentView instanceof SlidingPaneLayout) {
-			SlidingPaneLayout mSlidingPaneLayout = (SlidingPaneLayout) mContentView;
+		if (mContentView instanceof WrappingSlidingPaneLayout) {
+			WrappingSlidingPaneLayout mSlidingPaneLayout = (WrappingSlidingPaneLayout) mContentView;
 			return mSlidingPaneLayout.isOpen();
 		} else {
 			return true;
@@ -268,8 +279,7 @@ public class ConversationActivity extends XmppActivity
 		listView.setUndoStyle(EnhancedListView.UndoStyle.SINGLE_POPUP);
 		listView.setUndoHideDelay(5000);
 		listView.setRequireTouchBeforeDismiss(false);
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.attachToListView(listView);
+		final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.show();
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -283,13 +293,14 @@ public class ConversationActivity extends XmppActivity
 		if (mContentView == null) {
 			mContentView = findViewById(R.id.content_view_ll);
 		}
-		if (mContentView instanceof SlidingPaneLayout) {
-			SlidingPaneLayout mSlidingPaneLayout = (SlidingPaneLayout) mContentView;
+		if (mContentView instanceof WrappingSlidingPaneLayout) {
+			WrappingSlidingPaneLayout mSlidingPaneLayout = (WrappingSlidingPaneLayout) mContentView;
 			mSlidingPaneLayout.setParallaxDistance(150);
 			mSlidingPaneLayout
 				.setShadowResource(R.drawable.es_slidingpane_shadow);
 			mSlidingPaneLayout.setSliderFadeColor(0);
-			mSlidingPaneLayout.setPanelSlideListener(new PanelSlideListener() {
+			mSlidingPaneLayout.setPanelSlideListener(new WrappingSlidingPaneLayout
+					.PanelSlideListener() {
 
 				@Override
 				public void onPanelOpened(View arg0) {
@@ -345,6 +356,17 @@ public class ConversationActivity extends XmppActivity
 					ab.setTitle(conversation.getName());
 				} else {
 					ab.setTitle(conversation.getJid().toBareJid().toString());
+				}
+
+				/* Attach up navigation behavior to the title. Note: This behavior will disappear
+				 * in Lollipop because the title TextView is no longer returned from findViewById.
+				 * This framework change appears to be intentional.
+				 * */
+				final int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+				Log.v(Config.LOGTAG, "titleId " + titleId);
+				mActionBarTitleBox = (View) findViewById(titleId).getParent();
+				if (mActionBarTitleBox != null) {
+					mActionBarTitleBox.setOnClickListener(mActionBarTitleListener);
 				}
 			} else {
 				ab.setDisplayHomeAsUpEnabled(false);
@@ -1149,7 +1171,7 @@ public class ConversationActivity extends XmppActivity
 			}
 			hideConversationsOverview();
 			openConversation();
-			if (mContentView instanceof SlidingPaneLayout) {
+			if (mContentView instanceof WrappingSlidingPaneLayout) {
 				updateActionBarTitle(true); //fixes bug where slp isn't properly closed yet
 			}
 			if (downloadUuid != null) {

@@ -87,7 +87,15 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 	private List<String> mKnownConferenceHosts;
 	private Invite mPendingInvite = null;
 	private Menu mOptionsMenu;
+	private View mActionBarTitleBox;
 	private EditText mSearchEditText;
+	private final View.OnClickListener mActionBarTitleListener = new View.OnClickListener() {
+
+		@Override
+		public void onClick(final View v) {
+			finish();
+		}
+	};
 	private MenuItem.OnActionExpandListener mOnActionExpandListener = new MenuItem.OnActionExpandListener() {
 
 		@Override
@@ -221,7 +229,7 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int position, long arg3) {
+										int position, long arg3) {
 					openConversationForBookmark(position);
 				}
 			});
@@ -235,13 +243,17 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int position, long arg3) {
+										int position, long arg3) {
 					openConversationForContact(position);
 				}
 			});
 
 		this.mHideOfflineContacts = getPreferences().getBoolean("hide_offline", false);
-
+		final int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+		mActionBarTitleBox = (View) findViewById(titleId);
+		if (mActionBarTitleBox != null) {
+			mActionBarTitleBox.setOnClickListener(mActionBarTitleListener);
+		}
 	}
 
 	protected void openConversationForContact(int position) {
