@@ -9,7 +9,7 @@ public final class Config {
 	public static final String LOGTAG = "conversations";
 
 	/* Keep in sync with AccManager.java */
-	public static final String ACTION_ADD_ACCOUNT = "eu.siacs.conversations.ADD_ACCOUNT";
+	public static final String ACTION_JABBER_ADD_ACCOUNT = "eu.siacs.conversations.ADD_ACCOUNT";
 	public static final String EXTRAS_IP = "jabber_ip";
 	public static final String EXTRAS_USE_TLS = "jabber_use_tls";
 	public static final String EXTRAS_JID = "jabber_id";

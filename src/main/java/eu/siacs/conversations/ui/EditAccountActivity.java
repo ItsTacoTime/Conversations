@@ -549,7 +549,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		/* Account configuration from intent. */
 		Intent intent = getIntent();
 		String action = intent.getAction();
-		if (action != null && action.equals(Config.ACTION_ADD_ACCOUNT)) {
+		if (action != null && action.equals(Config.ACTION_JABBER_ADD_ACCOUNT)) {
 			new AutoConfigureAccountTask().execute(intent);
 			finish();
 		}
