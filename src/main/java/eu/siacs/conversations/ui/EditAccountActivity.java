@@ -625,13 +625,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			String jabberIp = intent.getStringExtra(Config.EXTRAS_IP);
 			String jabberPassword = intent.getStringExtra(Config.EXTRAS_PASSWORD);
 			boolean jabberUseTls = intent.getBooleanExtra(Config.EXTRAS_USE_TLS, true);
-
-
-			/* For debugging only using adb */
-			String jabberPortString = intent.getStringExtra(Config.EXTRAS_PORT);
-			Log.v(TAG, "Jabber port string: " + jabberPortString);
-			//int jabberPort = Integer.parseInt(jabberPortString);
-			/* ***************************** */
+			int jabberPort = intent.getIntExtra(Config.EXTRAS_PORT, 5222); // default port is 5222
 
 			Log.v(TAG, "Configuring jabber account for "
 					+ jabberId + " on ip: " + jabberIp + ":" + jabberPort);

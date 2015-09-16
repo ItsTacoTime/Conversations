@@ -363,7 +363,7 @@ public class ConversationActivity extends XmppActivity
 				 * This framework change appears to be intentional.
 				 * */
 				final int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-				Log.v(Config.LOGTAG, "titleId " + titleId);
+				//Log.v(Config.LOGTAG, "titleId " + titleId);
 				mActionBarTitleBox = (View) findViewById(titleId).getParent();
 				if (mActionBarTitleBox != null) {
 					mActionBarTitleBox.setOnClickListener(mActionBarTitleListener);
