@@ -863,10 +863,6 @@ public abstract class XmppActivity extends Activity {
 		return this.mColorRed;
 	}
 
-	public int getPrimaryColor() {
-		return this.mPrimaryColor;
-	}
-
 	public int getOnlineColor() {
 		return this.mColorGreen;
 	}

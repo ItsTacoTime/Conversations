@@ -27,14 +27,13 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Set;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Set;
+
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.R;
-import eu.siacs.conversations.Config;
 import eu.siacs.conversations.crypto.axolotl.AxolotlService;
 import eu.siacs.conversations.entities.Account;
 import eu.siacs.conversations.entities.AccountRemotium;
@@ -345,9 +344,9 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		}
 		return !unmodified.equals(this.mAccountJid.getText().toString()) ||
 				!this.mAccount.getPassword().equals(this.mPassword.getText().toString())
-				|| !getIpExtra().equals(
+				|| !getExtra(Config.EXTRAS_IP).equals(
 				this.mAdvancedSettingServer.getText().toString())
-				|| !getPortExtra().equals(
+				|| !getExtra(Config.EXTRAS_PORT).equals(
 				this.mAdvancedSettingPort.getText().toString())
 				|| !(this.mAccount.isOptionSet(Account.OPTION_USETLS) ==
 				this.mUseTLS.isChecked());
