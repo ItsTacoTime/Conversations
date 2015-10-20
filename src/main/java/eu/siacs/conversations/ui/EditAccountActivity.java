@@ -1,14 +1,17 @@
 package eu.siacs.conversations.ui;
 
 import android.app.AlertDialog.Builder;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,18 +30,22 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Set;
+import java.util.List;
 
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.R;
 import eu.siacs.conversations.crypto.axolotl.AxolotlService;
 import eu.siacs.conversations.entities.Account;
 import eu.siacs.conversations.entities.AccountRemotium;
+import eu.siacs.conversations.services.XmppConnectionService;
 import eu.siacs.conversations.services.XmppConnectionService.OnAccountUpdate;
 import eu.siacs.conversations.ui.adapter.KnownHostsAdapter;
+import eu.siacs.conversations.utils.Configurator;
 import eu.siacs.conversations.utils.CryptoHelper;
 import eu.siacs.conversations.utils.UIHelper;
 import eu.siacs.conversations.xmpp.OnKeyStatusUpdated;
@@ -525,6 +532,42 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	}
 
 	@Override
+	public void onPause() {
+		super.onPause();
+		/*  TODO: Decide whether or not to remove this -- This might be useful for status.
+		SharedPreferences prefs = getBaseContext().getSharedPreferences(getBaseContext().getPackageName(), MODE_PRIVATE);
+		SharedPreferences.Editor ed = prefs.edit();
+		Jid jidToSave = null;
+		if (mAccount != null) {
+			jidToSave = mAccount.getJid();
+		}
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(Config.EXTRAS_JID, jidToSave == null ? Config.NO_JID : jidToSave.toBareJid().toString());
+		} catch (JSONException e) {
+			Log.e(Config.LOGTAG, "JSONException during account save.");
+		}
+		ed.putString(Configurator.JSON_RESULTS, jsonObject.toString());
+		ed.commit();
+		*/
+	}
+
+	private void showAlertDialog() {
+
+		TextView message = new TextView(this);
+		message.setText("\n" +
+				"Please contact your administrator to configure SecureIM." +
+				"\n");
+		message.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+
+		AlertDialog.Builder alert = new AlertDialog.Builder(this)
+				.setView(message)
+				.setCancelable(false);
+
+		AlertDialog alertDialog = alert.create();
+		alertDialog.show();
+	}
+	@Override
 	protected void onBackendConnected() {
 		if (this.jidToEdit != null) {
 			this.mAccount = xmppConnectionService.findAccountByJid(jidToEdit);
@@ -537,6 +580,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			}
 			this.mCancelButton.setEnabled(false);
 			this.mCancelButton.setTextColor(getSecondaryTextColor());
+			showAlertDialog();
 		}
 		if (Config.DOMAIN_LOCK == null) {
 			final KnownHostsAdapter mKnownHostsAdapter = new KnownHostsAdapter(this,
@@ -546,14 +590,73 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		}
 
 		/* Account configuration from intent. */
+		/* TODO: Refactor and remove from UI thread */
 		Intent intent = getIntent();
 		String action = intent.getAction();
 		if (action != null && action.equals(Config.ACTION_JABBER_ADD_ACCOUNT)) {
 			new AutoConfigureAccountTask().execute(intent);
+			Log.d(Config.LOGTAG, "Finished adding account.");
 			finish();
+		} else if (action != null && action.equals(Config.ACTION_JABBER_DISABLE_ACCOUNT)) {
+			Intent i = new Intent(xmppConnectionService, XmppConnectionService.class);
+			i.setAction(XmppConnectionService.ACTION_DISABLE_ACCOUNT);
+			i.putExtra("account", intent.getStringExtra(Config.EXTRAS_JID));
+			startService(i);
+			Log.d(Config.LOGTAG, "Finished disabling account.");
+			finish();
+		} else if (action != null && action.equals(Config.ACTION_JABBER_LIST_ACCOUNT)) {
+			List<Account> accountList = xmppConnectionService.getAccounts();
+			JSONArray accountArray = new JSONArray();
+			for (Account account : accountList) {
+				accountArray.put(account.getJid().toBareJid().toString());
+			}
+
+			SharedPreferences prefs = getBaseContext().getSharedPreferences(
+					getBaseContext().getPackageName(), MODE_PRIVATE);
+			SharedPreferences.Editor ed = prefs.edit();
+			ed.putInt(Config.JID_COUNT, accountList.size());
+			JSONObject jsonObj = new JSONObject();
+			try {
+				jsonObj.put(Config.JID_COUNT, accountList.size());
+				jsonObj.put(Config.ACTION_JABBER_LIST_ACCOUNT, accountArray);
+			} catch (JSONException e) {
+				Log.d(Config.LOGTAG, "JSON Exception during account list.");
+			}
+			ed.putString(Configurator.JSON_RESULTS, jsonObj.toString());
+			ed.commit();
+			Log.d(Config.LOGTAG, "Finished listing accounts.");
+			finish();
+		} else if (action != null && action.equals(Config.ACTION_JABBER_DELETE_ACCOUNT)) {
+			Account accountToDelete;
+			try {
+				accountToDelete = xmppConnectionService.findAccountByJid(
+						Jid.fromString(intent.getStringExtra(Config.EXTRAS_JID)));
+				if (accountToDelete != null) {
+					xmppConnectionService.deleteAccount(accountToDelete);
+					Log.d(Config.LOGTAG, "Finished deleting account.");
+				}
+				else {
+					setReturnCode(Configurator.RETURN_FAILURE);
+				}
+			} catch (InvalidJidException e) {
+				setReturnCode(Configurator.RETURN_FAILURE);
+			}
 		}
 
 		updateSaveButton();
+	}
+
+	/**
+	 * This hack here was needed because Instrumentation.ActivityMonitor fails to return a proper
+	 * return code after the Activity exits.
+	 * @param retValue	Either RETURN_SUCCESS or RETURN_FAILURE from {@link Configurator}.
+	 */
+	private void setReturnCode(int retValue) {
+		SharedPreferences prefs = getBaseContext().getSharedPreferences(
+				getBaseContext().getPackageName(), MODE_PRIVATE);
+		SharedPreferences.Editor ed = prefs.edit();
+		ed.putInt(Configurator.RETURN_CODE, retValue);
+		ed.commit();
 	}
 
 	@Override
@@ -583,7 +686,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	/*
 	 * Configure a jabber account from Intent. If the account already exists,
 	 * reconfigure the account with new information.
-	 * TODO: Need to add a mechanism for deleting an account.
+	 *
 	 */
 	private class AutoConfigureAccountTask extends AsyncTask<Intent, Void, Void> {
 		@Override

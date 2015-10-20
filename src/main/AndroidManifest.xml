@@ -155,4 +155,10 @@
         </activity>
     </application>
 
+    <instrumentation
+        android:functionalTest="true"
+        android:handleProfiling="false"
+        android:name="eu.siacs.conversations.utils.Configurator"
+        android:targetPackage="eu.siacs.conversations" />
+
 </manifest>
