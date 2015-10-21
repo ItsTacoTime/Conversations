@@ -30,12 +30,10 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Set;
-import java.util.List;
 
 import eu.siacs.conversations.Config;
 import eu.siacs.conversations.R;
@@ -531,27 +529,6 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		}
 	}
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		/*  TODO: Decide whether or not to remove this -- This might be useful for status.
-		SharedPreferences prefs = getBaseContext().getSharedPreferences(getBaseContext().getPackageName(), MODE_PRIVATE);
-		SharedPreferences.Editor ed = prefs.edit();
-		Jid jidToSave = null;
-		if (mAccount != null) {
-			jidToSave = mAccount.getJid();
-		}
-		JSONObject jsonObject = new JSONObject();
-		try {
-			jsonObject.put(Config.EXTRAS_JID, jidToSave == null ? Config.NO_JID : jidToSave.toBareJid().toString());
-		} catch (JSONException e) {
-			Log.e(Config.LOGTAG, "JSONException during account save.");
-		}
-		ed.putString(Configurator.JSON_RESULTS, jsonObject.toString());
-		ed.commit();
-		*/
-	}
-
 	private void showAlertDialog() {
 
 		TextView message = new TextView(this);
@@ -590,7 +567,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		}
 
 		/* Account configuration from intent. */
-		/* TODO: Refactor and remove from UI thread */
+		/* TODO: Refactor and remove from UI thread. IntentService?*/
 		Intent intent = getIntent();
 		String action = intent.getAction();
 		if (action != null && action.equals(Config.ACTION_JABBER_ADD_ACCOUNT)) {
@@ -603,28 +580,6 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			i.putExtra("account", intent.getStringExtra(Config.EXTRAS_JID));
 			startService(i);
 			Log.d(Config.LOGTAG, "Finished disabling account.");
-			finish();
-		} else if (action != null && action.equals(Config.ACTION_JABBER_LIST_ACCOUNT)) {
-			List<Account> accountList = xmppConnectionService.getAccounts();
-			JSONArray accountArray = new JSONArray();
-			for (Account account : accountList) {
-				accountArray.put(account.getJid().toBareJid().toString());
-			}
-
-			SharedPreferences prefs = getBaseContext().getSharedPreferences(
-					getBaseContext().getPackageName(), MODE_PRIVATE);
-			SharedPreferences.Editor ed = prefs.edit();
-			ed.putInt(Config.JID_COUNT, accountList.size());
-			JSONObject jsonObj = new JSONObject();
-			try {
-				jsonObj.put(Config.JID_COUNT, accountList.size());
-				jsonObj.put(Config.ACTION_JABBER_LIST_ACCOUNT, accountArray);
-			} catch (JSONException e) {
-				Log.d(Config.LOGTAG, "JSON Exception during account list.");
-			}
-			ed.putString(Configurator.JSON_RESULTS, jsonObj.toString());
-			ed.commit();
-			Log.d(Config.LOGTAG, "Finished listing accounts.");
 			finish();
 		} else if (action != null && action.equals(Config.ACTION_JABBER_DELETE_ACCOUNT)) {
 			Account accountToDelete;
@@ -647,8 +602,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	}
 
 	/**
-	 * This hack here was needed because Instrumentation.ActivityMonitor fails to return a proper
-	 * return code after the Activity exits.
+	 * Note: Instrumentation is not currently so the commit is commented.
 	 * @param retValue	Either RETURN_SUCCESS or RETURN_FAILURE from {@link Configurator}.
 	 */
 	private void setReturnCode(int retValue) {
@@ -656,7 +610,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 				getBaseContext().getPackageName(), MODE_PRIVATE);
 		SharedPreferences.Editor ed = prefs.edit();
 		ed.putInt(Configurator.RETURN_CODE, retValue);
-		ed.commit();
+		//ed.commit();
 	}
 
 	@Override
@@ -691,7 +645,6 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 	private class AutoConfigureAccountTask extends AsyncTask<Intent, Void, Void> {
 		@Override
 		protected Void doInBackground(Intent... intents) {
-			/* TODO: Need to check to make sure this doesn't get stuck in a loop */
 			if (xmppConnectionService == null) {
 				// This should never happen
 				Log.e(TAG, "Need to wait for XMPPConnectionService reconnect.");

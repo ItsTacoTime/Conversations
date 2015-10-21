@@ -14,14 +14,22 @@ import eu.siacs.conversations.Config;
 /**
  * Created by hlew on 10/16/15.
  *
+ * Note: This functionality is currently not used. To use it, add instrumentation to the manifest.
+ *     <instrumentation
+ *          android:functionalTest="true"
+ *          android:handleProfiling="false"
+ *          android:name="eu.siacs.conversations.utils.Configurator"
+ *          android:targetPackage="eu.siacs.conversations" />
+ *
  * This class starts the EditAccountActivity to reconfigure the account for Remotium.
  * This approach is similar to the approach used in the
  * {@link Activity} class' startActivityForResult() implementation.
  */
 public class Configurator extends Instrumentation {
+    /* Keep in sync with AccManager2.java */
     private static final String ACTION_KEY = "action_key";
-    public static final String JSON_RESULTS = "json_results";
-    public static final String RETURN_CODE = "return_code";
+    public static final String JSON_RESULTS = "results";
+    public static final String RETURN_CODE = "status";
     public static final int RETURN_SUCCESS = 0;
     public static final int RETURN_FAILURE = -1;
 
@@ -63,7 +71,7 @@ public class Configurator extends Instrumentation {
         Log.d(Config.LOGTAG, "Instrumentation: Start activity");
         Intent i = bundleToIntent(mArguments);
         i.setComponent(new ComponentName("eu.siacs.conversations", "eu.siacs.conversations.ui.EditAccountActivity"));
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         synchronized(mSync) {
             Log.d(Config.LOGTAG, "Instrumentation: StartActivitySync");
             startActivitySync(i);

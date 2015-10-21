@@ -18,7 +18,7 @@ public final class Config {
 	public static final String EXTRAS_JID = "jabber_id";
 	public static final String EXTRAS_PORT = "jabber_port";
 	public static final String EXTRAS_PASSWORD = "jabber_password";
-	public static final String JID_COUNT = "jabber_account_count";
+	public static final String JID_COUNT = "count";
 
 	public static final String DOMAIN_LOCK = null; //only allow account creation for this domain
 	public static final boolean DISALLOW_REGISTRATION_IN_UI = false; //hide the register checkbox
