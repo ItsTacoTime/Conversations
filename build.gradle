@@ -50,7 +50,7 @@ android {
 	defaultConfig {
 		applicationId "eu.siacs.conversations"
 		minSdkVersion 14
-		targetSdkVersion 21
+		targetSdkVersion 15
 		versionCode 95
 		versionName "1.6.9"
 		project.ext.set(archivesBaseName, archivesBaseName + "-" + versionName);
