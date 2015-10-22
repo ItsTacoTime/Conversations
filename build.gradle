@@ -66,9 +66,9 @@ android {
 	// $HOME/.gradle or in your project directory with this content:
 	//
 	// mStoreFile=/path/to/key.store
-	// mStorePassword=xxx
+	// mStorePassword=xxxxxx
 	// mKeyAlias=alias
-	// mKeyPassword=xxx
+	// mKeyPassword=
 	//
 	if (project.hasProperty('mStoreFile') &&
 			project.hasProperty('mStorePassword') &&
