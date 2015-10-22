@@ -90,6 +90,7 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 	private Menu mOptionsMenu;
 	private View mActionBarTitleBox;
 	private EditText mSearchEditText;
+
 	private final View.OnClickListener mActionBarTitleListener = new View.OnClickListener() {
 
 		@Override
@@ -226,11 +227,11 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 		mConferenceListFragment.setListAdapter(mConferenceAdapter);
 		mConferenceListFragment.setContextMenu(R.menu.conference_context);
 		mConferenceListFragment
-			.setOnListItemClickListener(new OnItemClickListener() {
+				.setOnListItemClickListener(new OnItemClickListener() {
 
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-										int position, long arg3) {
+					@Override
+					public void onItemClick(AdapterView<?> arg0, View arg1,
+											int position, long arg3) {
 					openConversationForBookmark(position);
 				}
 			});
@@ -240,11 +241,11 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 		mContactsListFragment.setListAdapter(mContactsAdapter);
 		mContactsListFragment.setContextMenu(R.menu.contact_context);
 		mContactsListFragment
-			.setOnListItemClickListener(new OnItemClickListener() {
+				.setOnListItemClickListener(new OnItemClickListener() {
 
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-										int position, long arg3) {
+					@Override
+					public void onItemClick(AdapterView<?> arg0, View arg1,
+											int position, long arg3) {
 					openConversationForContact(position);
 				}
 			});
@@ -608,6 +609,9 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 			ab.setDisplayShowHomeEnabled(false);
 			ab.setDisplayHomeAsUpEnabled(false);
 			ab.setHomeButtonEnabled(false);
+
+			// In order to turn off Home enabled on the title.
+			mActionBarTitleBox.setOnClickListener(null);
 		}
 		this.mKnownHosts = xmppConnectionService.getKnownHosts();
 		this.mKnownConferenceHosts = xmppConnectionService.getKnownConferenceHosts();
