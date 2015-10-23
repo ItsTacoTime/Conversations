@@ -382,7 +382,7 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 						final Jid accountJid;
 						try {
 							if (Config.DOMAIN_LOCK != null) {
-								accountJid = Jid.fromParts((String) spinner.getSelectedItem(),Config.DOMAIN_LOCK,null);
+								accountJid = Jid.fromParts((String) spinner.getSelectedItem(), Config.DOMAIN_LOCK, null);
 							} else {
 								accountJid = Jid.fromString((String) spinner.getSelectedItem());
 							}
@@ -611,7 +611,9 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 			ab.setHomeButtonEnabled(false);
 
 			// In order to turn off Home enabled on the title.
-			mActionBarTitleBox.setOnClickListener(null);
+			if (mActionBarTitleBox != null) {
+				mActionBarTitleBox.setOnClickListener(null);
+			}
 		}
 		this.mKnownHosts = xmppConnectionService.getKnownHosts();
 		this.mKnownConferenceHosts = xmppConnectionService.getKnownConferenceHosts();
