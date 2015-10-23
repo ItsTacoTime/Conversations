@@ -287,7 +287,10 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			@Override
 			public void run() {
 				final Intent intent;
+				if (true) { // Removed the profile picture publishing permanently. Always skips it.
+				/*
 				if (avatar != null) {
+				*/
 					intent = new Intent(getApplicationContext(),
 							StartConversationActivity.class);
 					if (xmppConnectionService != null && xmppConnectionService.getAccounts().size() == 1) {
