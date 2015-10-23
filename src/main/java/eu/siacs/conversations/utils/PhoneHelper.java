@@ -29,6 +29,13 @@ public class PhoneHelper {
 				+ "=\"" + ContactsContract.CommonDataKinds.Im.PROTOCOL_JABBER
 				+ "\")";
 
+		/**
+		 * Remotium: The CursorLoader is removed because it fails for an unknown reason and the
+		 * callback is not received from the CursorLoader thread. The resolution is to simply
+		 * load the contacts in the service itself. Since CursorLoader usage is to protect the
+		 * UI thread, this should be sufficient.
+
+
 		CursorLoader mCursorLoader = new CursorLoader(context,
 				ContactsContract.Data.CONTENT_URI, PROJECTION, SELECTION, null,
 				null);
@@ -70,6 +77,35 @@ public class PhoneHelper {
 			if (listener != null) {
 				listener.onPhoneContactsLoaded(phoneContacts);
 			}
+		}
+		*/
+		
+		Cursor cursor = context.getContentResolver().query(
+				ContactsContract.Data.CONTENT_URI, PROJECTION, SELECTION, null, null);
+		if (cursor == null) {
+			return;
+		}
+		while (cursor.moveToNext()) {
+			Bundle contact = new Bundle();
+			contact.putInt("phoneid", cursor.getInt(cursor
+					.getColumnIndex(ContactsContract.Data._ID)));
+			contact.putString(
+					"displayname",
+					cursor.getString(cursor
+							.getColumnIndex(ContactsContract.Data.DISPLAY_NAME)));
+			contact.putString("photouri", cursor.getString(cursor
+					.getColumnIndex(ContactsContract.Data.PHOTO_URI)));
+			contact.putString("lookup", cursor.getString(cursor
+					.getColumnIndex(ContactsContract.Data.LOOKUP_KEY)));
+
+			contact.putString(
+					"jid",
+					cursor.getString(cursor
+							.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA)));
+			phoneContacts.add(contact);
+		}
+		if (listener != null) {
+			listener.onPhoneContactsLoaded(phoneContacts);
 		}
 	}
 

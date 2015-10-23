@@ -61,6 +61,7 @@ import eu.siacs.conversations.entities.Conversation;
 import eu.siacs.conversations.entities.Message;
 import eu.siacs.conversations.entities.MucOptions;
 import eu.siacs.conversations.entities.MucOptions.OnRenameListener;
+import eu.siacs.conversations.entities.Roster;
 import eu.siacs.conversations.entities.Transferable;
 import eu.siacs.conversations.entities.TransferablePlaceholder;
 import eu.siacs.conversations.generator.IqGenerator;
@@ -916,6 +917,11 @@ public class XmppConnectionService extends Service implements OnPhoneContactsLoa
 				Log.d(Config.LOGTAG,"start merging phone contacts with roster");
 				for (Account account : accounts) {
 					List<Contact> withSystemAccounts = account.getRoster().getWithSystemAccounts();
+					/**
+					 * Removed by Remotium: The mechanism to sync the profile picture
+					 * from system contacts is replaced with a mechanism to retrieve
+					 * system contacts from ContactsContract {@link PhoneHelper}
+
 					for (Bundle phoneContact : phoneContacts) {
 						if (Thread.interrupted()) {
 							Log.d(Config.LOGTAG,"interrupted merging phone contacts");
@@ -938,12 +944,41 @@ public class XmppConnectionService extends Service implements OnPhoneContactsLoa
 						contact.setSystemName(phoneContact.getString("displayname"));
 						withSystemAccounts.remove(contact);
 					}
+
 					for(Contact contact : withSystemAccounts) {
 						contact.setSystemAccount(null);
 						contact.setSystemName(null);
 						if (contact.setPhotoUri(null)) {
 							getAvatarService().clear(contact);
 						}
+					}
+					*/
+
+					Roster accountRoster = account.getRoster();
+					accountRoster.markAllAsNotInRoster();
+					for (Bundle phoneContact : phoneContacts) {
+						if (Thread.interrupted()) {
+							Log.d(Config.LOGTAG, "interrupted merging phone contacts");
+							return;
+						}
+						Jid jid;
+						try {
+							jid = Jid.fromString(phoneContact.getString("jid"));
+						} catch (final InvalidJidException e) {
+							continue;
+						}
+						final Contact contact = new Contact(jid);
+
+						contact.setSystemName(phoneContact.getString("displayname"));
+
+						String systemAccount = phoneContact.getInt("phoneid")
+								+ "#"
+								+ phoneContact.getString("lookup");
+						contact.setSystemAccount(systemAccount);
+						contact.setSystemName(phoneContact.getString("displayname"));
+						// Ensures the ListItem adapter in StartConversationActivity there's an update.
+						contact.setOption(Contact.Options.DIRTY_PUSH);
+						accountRoster.initContact(contact);
 					}
 				}
 				Log.d(Config.LOGTAG,"finished merging phone contacts");
