@@ -432,13 +432,20 @@ public class MemorizingTrustManager implements X509TrustManager {
 	public void checkClientTrusted(X509Certificate[] chain, String authType)
 		throws CertificateException
 	{
+		/**
+		 * Remotium: Removed trusted certificate check as requested to prevent warning dialog.
+		 *
 		checkCertTrusted(chain, authType, false,true);
+		 */
 	}
 
 	public void checkServerTrusted(X509Certificate[] chain, String authType)
 		throws CertificateException
 	{
+		/**
+		 * Remotium: Removed trusted certificate check as requested to prevent warning dialog.
 		checkCertTrusted(chain, authType, true,true);
+		 */
 	}
 
 	public X509Certificate[] getAcceptedIssuers()
