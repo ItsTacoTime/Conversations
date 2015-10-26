@@ -65,6 +65,7 @@ public class ManageAccountActivity extends XmppActivity implements OnAccountUpda
 				switchToAccount(accountList.get(position));
 			}
 		});
+		accountListView.setOnItemClickListener(null);
 		registerForContextMenu(accountListView);
 	}
 

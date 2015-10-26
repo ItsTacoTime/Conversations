@@ -532,21 +532,21 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 		}
 	}
 
-	private void showAlertDialog() {
-
-		TextView message = new TextView(this);
-		message.setText("\n" +
-				"Please contact your administrator to configure SecureIM." +
-				"\n");
-		message.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-
-		AlertDialog.Builder alert = new AlertDialog.Builder(this)
-				.setView(message)
-				.setCancelable(false);
-
-		AlertDialog alertDialog = alert.create();
-		alertDialog.show();
+	private void showContactAdminDialog() {
+		Builder builder = new Builder(this);
+		builder.setTitle("Account setup");
+		builder.setIconAttribute(android.R.attr.alertDialogIcon);
+		builder.setMessage(R.string.contact_admin_to_configure);
+		builder.setPositiveButton("Close",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				});
+		builder.create().show();
 	}
+
 	@Override
 	protected void onBackendConnected() {
 		if (this.jidToEdit != null) {
@@ -560,7 +560,7 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 			}
 			this.mCancelButton.setEnabled(false);
 			this.mCancelButton.setTextColor(getSecondaryTextColor());
-			showAlertDialog();
+			showContactAdminDialog();
 		}
 		if (Config.DOMAIN_LOCK == null) {
 			final KnownHostsAdapter mKnownHostsAdapter = new KnownHostsAdapter(this,

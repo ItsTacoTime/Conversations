@@ -414,6 +414,8 @@ public class ConversationFragment extends Fragment implements EditMessage.Keyboa
 				}
 			}
 		});
+		/* Remotiium: Editing the accoount is currently unsupported. */
+		messageListAdapter.setOnContactPictureClicked(null);
 		messageListAdapter
 				.setOnContactPictureLongClicked(new OnContactPictureLongClicked() {
 
@@ -437,6 +439,8 @@ public class ConversationFragment extends Fragment implements EditMessage.Keyboa
 						}
 					}
 				});
+		/* Remotium: Editing the contact details is currently unsupported. */
+		messageListAdapter.setOnContactPictureClicked(null);
 		messagesView.setAdapter(messageListAdapter);
 
 		registerForContextMenu(messagesView);

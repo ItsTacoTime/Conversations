@@ -16,10 +16,12 @@
         android:id="@+id/action_join_conference"
         android:icon="?attr/icon_add_group"
         android:showAsAction="always"
+        android:visible="false"
         android:title="@string/join_conference" />
     <item
         android:id="@+id/action_scan_qr_code"
         android:showAsAction="never"
+        android:visible="false"
         android:title="@string/scan_qr_code" />
 
     <item
@@ -28,6 +30,7 @@
         android:checked="false"
         android:orderInCategory="85"
         android:showAsAction="never"
+        android:visible="false"
         android:title="@string/hide_offline"/>
     <!--
         Removed account management feature.
@@ -41,11 +44,13 @@
         android:id="@+id/action_accounts"
         android:orderInCategory="90"
         android:showAsAction="never"
+        android:visible="false"
         android:title="@string/action_accounts" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
+        android:visible="false"
         android:title="@string/action_settings" />
 
 </menu>

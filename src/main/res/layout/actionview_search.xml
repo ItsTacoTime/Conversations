@@ -16,6 +16,9 @@
         android:inputType="textEmailAddress|textNoSuggestions"
         android:textColor="@color/white"
         android:textColorHint="@color/white70"
+        android:hint="@string/search_for_contacts_or_groups_remotium"/>
+        <!--
         android:hint="@string/search_for_contacts_or_groups"/>
+        -->
 
 </RelativeLayout>

@@ -44,7 +44,7 @@
 	<string name="participant">Participant</string>
 	<string name="visitor">Visitor</string>
 	<string name="remove_contact_text">Would you like to remove %s from your roster? The conversation associated with this contact will not be removed.</string>
-	<string name="remove_contact_text_remotium">Would you like to remove %s from your roster? The message associated with this contact will not be removed.</string>
+	<string name="remove_contact_text_remotium">Would you like to remove %s from your roster? The messages associated with this contact will not be removed.</string>
 	<string name="block_contact_text">Would you like to block %s from sending you messages?</string>
 	<string name="unblock_contact_text">Would you like to unblock %s and allow them to send you messages?</string>
 	<string name="block_domain_text">Block all contacts from %s?</string>
@@ -507,7 +507,7 @@
 	<string name="location">Location</string>
 	<string name="received_location">Received location</string>
 	<string name="title_undo_swipe_out_conversation">Conversation closed</string>
-	<string name="title_undo_swipe_out_conversation_remotium">Messages closed</string>
+	<string name="title_undo_swipe_out_conversation_remotium">Message closed</string>
 	<string name="title_undo_swipe_out_muc">Left conference</string>
 	<string name="pref_dont_trust_system_cas_title">Don’t trust system CAs</string>
 	<string name="pref_dont_trust_system_cas_summary">All certificates must be manually approved</string>
@@ -531,6 +531,7 @@
 	<string name="recently_used">Most recently used</string>
 	<string name="choose_quick_action">Choose quick action</string>
 	<string name="search_for_contacts_or_groups">Search for contacts or groups</string>
+	<string name="search_for_contacts_or_groups_remotium">Search for contacts</string>
 	<string name="send_private_message">Send private message</string>
 	<string name="user_has_left_conference">%s has left the conference!</string>
 	<string name="username">Username</string>
@@ -543,4 +544,5 @@
 	<string name="pref_use_white_background_summary">Show received messages as black text on a white background</string>
 	<string name="account_status_dns_timeout">Timeout in DNS</string>
 	<string name="server_info_broken">Broken</string>
+	<string name="contact_admin_to_configure">Please contact your administrator to configure SecureIM.</string>
 </resources>

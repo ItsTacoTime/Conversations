@@ -203,14 +203,19 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 		mConferencesTab = actionBar.newTab().setText(R.string.conferences)
 			.setTabListener(mTabListener);
 		actionBar.addTab(mContactsTab);
+		/* Remotium: Conferences are currently unsupported.
 		actionBar.addTab(mConferencesTab);
+		*/
 
 		mViewPager.setOnPageChangeListener(mOnPageChangeListener);
 		mViewPager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
 
 			@Override
 			public int getCount() {
+				/* Remotium: Conferences are currently unsupported.
 				return 2;
+				*/
+				return 1;
 			}
 
 			@Override
@@ -235,7 +240,6 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 					openConversationForBookmark(position);
 				}
 			});
-
 		mContactsAdapter = new ListItemAdapter(this, contacts);
 		((ListItemAdapter) mContactsAdapter).setOnTagClickedListener(this.mOnTagClickedListener);
 		mContactsListFragment.setListAdapter(mContactsAdapter);
@@ -252,7 +256,7 @@ public class StartConversationActivity extends XmppActivity implements OnRosterU
 
 		this.mHideOfflineContacts = getPreferences().getBoolean("hide_offline", false);
 		final int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-		mActionBarTitleBox = (View) findViewById(titleId);
+		mActionBarTitleBox = findViewById(titleId);
 		if (mActionBarTitleBox != null) {
 			mActionBarTitleBox.setOnClickListener(mActionBarTitleListener);
 		}

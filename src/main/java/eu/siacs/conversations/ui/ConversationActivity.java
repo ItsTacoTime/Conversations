@@ -431,7 +431,9 @@ public class ConversationActivity extends XmppActivity
 			menuMute.setVisible(false);
 			menuUnmute.setVisible(false);
 		} else {
+			/* Remotium: Removed the new message item menu in lieu of floating action button.
 			menuAdd.setVisible(!isConversationsOverviewHideable());
+			*/
 			if (this.getSelectedConversation() != null) {
 				if (this.getSelectedConversation().getNextEncryption() != Message.ENCRYPTION_NONE) {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -932,7 +934,7 @@ public class ConversationActivity extends XmppActivity
 			return true;
 		} else if (modifier && key == downKey) {
 			if (isConversationsOverviewHideable() && !isConversationsOverviewVisable()) {
-				showConversationsOverview();;
+				showConversationsOverview();
 			}
 			return selectDownConversation();
 		} else if (modifier && key == upKey) {
