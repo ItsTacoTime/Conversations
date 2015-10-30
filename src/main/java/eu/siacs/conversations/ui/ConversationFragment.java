@@ -328,8 +328,12 @@ public class ConversationFragment extends Fragment implements EditMessage.Keyboa
 		} else {
 			switch (conversation.getNextEncryption()) {
 				case Message.ENCRYPTION_NONE:
+					/* Remotium: We don't currently support encrypted messages.
 					mEditMessage
 							.setHint(getString(R.string.send_unencrypted_message));
+					*/
+					mEditMessage
+							.setHint(getString(R.string.send_remotium_message));
 					break;
 				case Message.ENCRYPTION_OTR:
 					mEditMessage.setHint(getString(R.string.send_otr_message));
