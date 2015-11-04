@@ -1,3 +1,6 @@
+<!-- Remotium: Removed the tablet layout because we changed the standard
+     layout to include a floating action button. When a UI is decided on
+     for tablets, we can revert this.
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/content_view_ll"
     android:layout_width="match_parent"
@@ -30,3 +33,46 @@
     </LinearLayout>
 
 </LinearLayout>
+-->
+<eu.siacs.conversations.utils.WrappingSlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_view_ll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey50"
+        android:orientation="vertical" >
+
+        <de.timroes.android.listview.EnhancedListView
+            android:id="@+id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/grey50"
+            android:divider="@color/black12"
+            android:dividerHeight="1dp" />
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/fab"
+            fab:fab_type="normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white_24dp"
+            fab:fab_colorNormal="@color/primary" />
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:id="@+id/selected_conversation"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</eu.siacs.conversations.utils.WrappingSlidingPaneLayout>
