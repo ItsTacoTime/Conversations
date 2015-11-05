@@ -1145,8 +1145,9 @@ public class ConversationActivity extends XmppActivity
 			}
 		}
 		forbidProcessingPendings = false;
-
+		/* Remotium: Don't phone home if there is a crash.
 		ExceptionHelper.checkForCrash(this, this.xmppConnectionService);
+		*/
 		setIntent(new Intent());
 	}
 
