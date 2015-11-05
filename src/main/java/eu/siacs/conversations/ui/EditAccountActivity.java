@@ -1,17 +1,14 @@
 package eu.siacs.conversations.ui;
 
 import android.app.AlertDialog.Builder;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +40,6 @@ import eu.siacs.conversations.entities.AccountRemotium;
 import eu.siacs.conversations.services.XmppConnectionService;
 import eu.siacs.conversations.services.XmppConnectionService.OnAccountUpdate;
 import eu.siacs.conversations.ui.adapter.KnownHostsAdapter;
-import eu.siacs.conversations.utils.Configurator;
 import eu.siacs.conversations.utils.CryptoHelper;
 import eu.siacs.conversations.utils.UIHelper;
 import eu.siacs.conversations.xmpp.OnKeyStatusUpdated;
@@ -593,27 +589,12 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 					xmppConnectionService.deleteAccount(accountToDelete);
 					Log.d(Config.LOGTAG, "Finished deleting account.");
 				}
-				else {
-					setReturnCode(Configurator.RETURN_FAILURE);
-				}
 			} catch (InvalidJidException e) {
-				setReturnCode(Configurator.RETURN_FAILURE);
+				Log.d(Config.LOGTAG, "Could not delete account.");
 			}
 		}
 
 		updateSaveButton();
-	}
-
-	/**
-	 * Note: Instrumentation is not currently so the commit is commented.
-	 * @param retValue	Either RETURN_SUCCESS or RETURN_FAILURE from {@link Configurator}.
-	 */
-	private void setReturnCode(int retValue) {
-		SharedPreferences prefs = getBaseContext().getSharedPreferences(
-				getBaseContext().getPackageName(), MODE_PRIVATE);
-		SharedPreferences.Editor ed = prefs.edit();
-		ed.putInt(Configurator.RETURN_CODE, retValue);
-		//ed.commit();
 	}
 
 	@Override
@@ -656,9 +637,6 @@ public class EditAccountActivity extends XmppActivity implements OnAccountUpdate
 
 			Intent intent = intents[0];
 			populateAccountFromIntent(intent);
-
-			/* TODO: You're leaking the password here. */
-			Log.v(TAG, "Contents of new account: " + mAccount.getContentValues().toString());
 
 			if (xmppConnectionService.findAccountByJid(mAccount.getJid()) != null) {
 				/* Update account */

@@ -153,14 +153,20 @@ public class XmppConnection implements Runnable {
 			tagWriter = new TagWriter();
 			this.changeStatus(Account.State.CONNECTING);
 			/*
-			 * We use rAccount.getServerOrIP() to test if a custom IP address should override DNS
-			 * lookup behavior. If no IP was provided, it returns the superclass domain for standard
-			 * lookup.
+			if (DNSHelper.isIp(account.getServer().toString())) {
+			 *
+			 * We use AccountRemotium:getServer() to test if a custom IP address
+			 * should override DNS lookup behavior. If the account has an IP as an extra, the IP
+			 * is returned. If no IP key, it returns the superclass domain for standard lookup.
 			 */
 			if (DNSHelper.isIp(account.getServer(Config.EXTRAS_IP).toString())) {
 				socket = new Socket();
 				try {
-					/* getServerOrIP() has also been used here during connect */
+					/*
+					socket.connect(new InetSocketAddress(account.getServer().toString(), 5222), Config.SOCKET_TIMEOUT * 1000);
+					 *
+					 * Since the account has an IP address, connect to the IP and not the domain.
+					 */
 					socket.connect(new InetSocketAddress(account.getServer(Config.EXTRAS_IP).toString(),
 							account.getPort()), Config.SOCKET_TIMEOUT * 1000);
 				} catch (IOException e) {
